@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"sync"
+	"time"
 
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
@@ -16,7 +17,6 @@ type MediaTrack struct {
 	trackID    string
 	kind       string // "audio" or "video"
 	codec      string
-	ssrc       uint32
 }
 
 // MediaConfig for creating media tracks
@@ -212,6 +212,9 @@ var (
 // Simple ID generator using crypto/rand
 func generateID() string {
 	b := make([]byte, 4)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		// Fallback to timestamp-based ID if crypto/rand fails
+		return hex.EncodeToString([]byte(time.Now().String())[:8])
+	}
 	return hex.EncodeToString(b)
 }

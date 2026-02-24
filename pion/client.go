@@ -552,6 +552,7 @@ func (c *Client) setupDataChannel(peer *PeerConnection, dc *webrtc.DataChannel) 
 		peer.eventsMu.Lock()
 		peer.events = append(peer.events, RtcEvent{
 			Type:    EventError,
+			PeerId:  peer.peerId,
 			Message: err.Error(),
 		})
 		peer.eventsMu.Unlock()

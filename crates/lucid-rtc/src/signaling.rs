@@ -74,6 +74,8 @@ pub enum Event {
 
     /// An error occurred
     Error {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        peer_id: Option<String>,
         message: String,
     },
 

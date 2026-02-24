@@ -60,6 +60,11 @@ func lucid_rtc_destroy_client(handle unsafe.Pointer) {
 		delete(clientHandles, h.id)
 	}
 	clientHandlesMu.Unlock()
+
+	// Clean up associated media client
+	mediaClientsMu.Lock()
+	delete(mediaClients, h.id)
+	mediaClientsMu.Unlock()
 }
 
 func getClient(handle unsafe.Pointer) *Client {
