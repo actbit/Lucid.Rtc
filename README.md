@@ -1,5 +1,7 @@
 # Lucid.Rtc
 
+**English** | [日本語](./README-ja.md)
+
 **WebRTC for .NET** - Cross-platform, multi-backend WebRTC bindings with a modern fluent API.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -67,6 +69,18 @@ await connection.DisposeAsync();
 ---
 
 ## API Documentation
+
+Detailed API documentation is available:
+
+- [High-Level API](./docs/api/high-level.md) - RtcConnection, Peer, Events
+- [Low-Level API](./docs/api/low-level.md) - RtcClient, MediaClient
+- [Common Types](./docs/api/types.md) - IceCandidate, MediaCodec, etc.
+- [MessagePack Extensions](./docs/api/messagepack.md) - Object serialization
+
+### Samples
+
+- [HighLevelSample](./dotnet/samples/HighLevelSample/) - Fluent API sample
+- [LowLevelSample](./dotnet/samples/LowLevelSample/) - Low-level API sample
 
 ### RtcConnectionBuilder
 
@@ -330,8 +344,16 @@ Lucid.Rtc/
 │   ├── Lucid.Rtc.Rust/         # Rust native packages
 │   ├── Lucid.Rtc.Pion/         # Pion native packages
 │   ├── Lucid.Rtc/              # Metapackage
-│   └── Lucid.Rtc.Tests/        # Unit tests
-├── docs/samples/               # Code samples
+│   ├── Lucid.Rtc.Tests/        # Unit tests
+│   └── samples/                # Sample projects
+│       ├── HighLevelSample/
+│       └── LowLevelSample/
+├── docs/api/                   # API documentation
+│   ├── ja/                     # Japanese docs
+│   ├── high-level.md
+│   ├── low-level.md
+│   ├── types.md
+│   └── messagepack.md
 ├── build.ps1 / build.sh        # Build scripts
 └── .github/workflows/          # CI/CD
 ```

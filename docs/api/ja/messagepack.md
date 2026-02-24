@@ -1,14 +1,14 @@
-# MessagePack Extensions
+# MessagePack拡張
 
-**English** | [日本語](./ja/messagepack.md)
+[English](../messagepack.md) | **日本語**
 
-[← README](../../README.md) | [High-Level](high-level.md) | [Low-Level](low-level.md) | [Types](types.md) | [MessagePack](messagepack.md)
+[← README](../../../README-ja.md) | [High-Level](high-level.md) | [Low-Level](low-level.md) | [型](types.md) | [MessagePack](messagepack.md)
 
 ---
 
-Optional package for strongly-typed object serialization.
+型安全なオブジェクトシリアライズ用オプションパッケージ。
 
-## Installation
+## インストール
 
 ```xml
 <PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.0" />
@@ -18,42 +18,42 @@ Optional package for strongly-typed object serialization.
 
 ## RtcMessagePackExtensions
 
-Static class providing extension methods.
+拡張メソッドを提供するスタティッククラス。
 
-### Properties
+### プロパティ
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `Options` | `MessagePackSerializerOptions` | Serializer options |
+| プロパティ | 型 | 説明 |
+|-----------|-----|------|
+| `Options` | `MessagePackSerializerOptions` | シリアライザオプション |
 
-### Extension Methods
+### 拡張メソッド
 
-| Method | Target | Parameters | Returns | Description |
-|--------|--------|------------|---------|-------------|
-| `SendObject<T>` | `Peer` | `T value` | `void` | Send object |
-| `BroadcastObject<T>` | `RtcConnection` | `T value` | `void` | Broadcast object |
-| `OnObject<T>` | `RtcConnection` | `Action<ObjectReceivedEvent<T>>` | `RtcConnection` | Register handler |
+| メソッド | 対象 | パラメータ | 戻り値 | 説明 |
+|---------|------|-----------|--------|------|
+| `SendObject<T>` | `Peer` | `T value` | `void` | オブジェクト送信 |
+| `BroadcastObject<T>` | `RtcConnection` | `T value` | `void` | オブジェクトブロードキャスト |
+| `OnObject<T>` | `RtcConnection` | `Action<ObjectReceivedEvent<T>>` | `RtcConnection` | ハンドラ登録 |
 
 ---
 
 ## ObjectReceivedEvent<T>
 
-Event for received MessagePack objects.
+受信したMessagePackオブジェクト用イベント。
 
-### Properties
+### プロパティ
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `PeerId` | `string?` | Source peer ID |
-| `Peer` | `Peer?` | Source peer object |
-| `Value` | `T` | Deserialized object |
-| `RawData` | `byte[]?` | Raw MessagePack data |
+| プロパティ | 型 | 説明 |
+|-----------|-----|------|
+| `PeerId` | `string?` | 送信元ピアID |
+| `Peer` | `Peer?` | 送信元ピアオブジェクト |
+| `Value` | `T` | デシリアライズ済みオブジェクト |
+| `RawData` | `byte[]?` | 生MessagePackデータ |
 
 ---
 
-## Usage
+## 使い方
 
-### Define Message Types
+### メッセージ型定義
 
 ```csharp
 using MessagePack;
@@ -82,31 +82,31 @@ public class PositionUpdate
 }
 ```
 
-### Send Objects
+### オブジェクト送信
 
 ```csharp
-// To specific peer
+// 特定のピアへ
 peer.SendObject(new ChatMessage
 {
     User = "Alice",
-    Text = "Hello World!"
+    Text = "こんにちは！"
 });
 
-// Broadcast to all peers
+// 全ピアにブロードキャスト
 connection.BroadcastObject(new ChatMessage
 {
     User = "System",
-    Text = "Welcome!"
+    Text = "ようこそ！"
 });
 
-// Game state update
+// ゲーム状態更新
 peer.SendObject(new PositionUpdate { X = 100, Y = 50, Z = 0 });
 ```
 
-### Receive Objects
+### オブジェクト受信
 
 ```csharp
-// Register typed handlers
+// 型付きハンドラ登録
 connection.OnObject<ChatMessage>(e =>
 {
     Console.WriteLine($"[{e.Value.User}] {e.Value.Text}");
@@ -118,14 +118,14 @@ connection.OnObject<PositionUpdate>(e =>
 });
 ```
 
-### Configure Serialization
+### シリアライズ設定
 
 ```csharp
-// LZ4 compression (recommended for large objects)
+// LZ4圧縮（大きなオブジェクト向け）
 RtcMessagePackExtensions.Options = MessagePackSerializerOptions.Standard
     .WithCompression(MessagePackCompression.Lz4Block);
 
-// Custom resolver
+// カスタムリゾルバ
 RtcMessagePackExtensions.Options = MessagePackSerializerOptions.Standard
     .WithResolver(CompositeResolver.Create(
         NativeDecimalResolver.Instance,
@@ -135,22 +135,22 @@ RtcMessagePackExtensions.Options = MessagePackSerializerOptions.Standard
 
 ---
 
-## Complete Example
+## 完全例
 
 ```csharp
 using Lucid.Rtc;
 using MessagePack;
 
-// Setup
+// セットアップ
 var connection = new RtcConnectionBuilder()
     .WithStunServer("stun:stun.l.google.com:19302")
     .Build();
 
-// Enable compression (optional)
+// 圧縮有効化（任意）
 RtcMessagePackExtensions.Options = MessagePackSerializerOptions.Standard
     .WithCompression(MessagePackCompression.Lz4Block);
 
-// Register handlers
+// ハンドラ登録
 connection
     .OnObject<ChatMessage>(e =>
     {
@@ -158,29 +158,29 @@ connection
     })
     .OnObject<PositionUpdate>(e =>
     {
-        Console.WriteLine($"Position: ({e.Value.X}, {e.Value.Y}, {e.Value.Z})");
+        Console.WriteLine($"位置: ({e.Value.X}, {e.Value.Y}, {e.Value.Z})");
     });
 
-// Create peer
+// ピア作成
 var peer = await connection.CreatePeerAsync("remote-player");
 
-// ... SDP negotiation ...
+// ... SDPネゴシエーション ...
 
-// Send typed messages
-peer.SendObject(new ChatMessage { User = "Player1", Text = "Hello!" });
+// 型付きメッセージ送信
+peer.SendObject(new ChatMessage { User = "Player1", Text = "こんにちは！" });
 peer.SendObject(new PositionUpdate { X = 10.5f, Y = 20.0f, Z = 5.0f });
 
-// Broadcast
-connection.BroadcastObject(new ChatMessage { User = "Server", Text = "Game starting!" });
+// ブロードキャスト
+connection.BroadcastObject(new ChatMessage { User = "Server", Text = "ゲーム開始！" });
 ```
 
 ---
 
-## MessagePack Attributes
+## MessagePack属性
 
 ### [MessagePackObject]
 
-Marks a class or struct as serializable.
+クラスまたは構造体をシリアライズ可能としてマーク。
 
 ```csharp
 [MessagePackObject]
@@ -192,7 +192,7 @@ public class MyClass
 
 ### [Key(int)]
 
-Property key by index (recommended for performance).
+インデックスによるプロパティキー（パフォーマンス推奨）。
 
 ```csharp
 [MessagePackObject]
@@ -208,7 +208,7 @@ public class Player
 
 ### [Key(string)]
 
-Property key by string name.
+文字列名によるプロパティキー。
 
 ```csharp
 [MessagePackObject(keyAsString: true)]
@@ -224,7 +224,7 @@ public class Config
 
 ### [IgnoreMember]
 
-Exclude property from serialization.
+シリアライズからプロパティを除外。
 
 ```csharp
 [MessagePackObject]
@@ -234,6 +234,6 @@ public class User
     public string Name { get; set; } = "";
 
     [IgnoreMember]
-    public string Password { get; set; } = "";  // Not serialized
+    public string Password { get; set; } = "";  // シリアライズされない
 }
 ```
