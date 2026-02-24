@@ -10,7 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 name = "lucid_rtc"
 
 [dependencies]
-lucid-rtc = { path = "../webrtc-sharp" }
+lucid-rtc = { path = "../lucid-rtc" }
 tokio.workspace = true
 serde_json.workspace = true
 tracing.workspace = true

@@ -6,7 +6,6 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-    <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Native.win-x64</PackageId>
     <Version>0.1.0</Version>
     <Authors>Lucid.Rtc</Authors>
@@ -18,9 +17,9 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
-  <!-- Core dependency -->
+  <!-- Project reference for local build, becomes package reference when packed -->
   <ItemGroup>
-    <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Native library -->

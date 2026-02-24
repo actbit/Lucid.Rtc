@@ -12,18 +12,20 @@
     <Description>Native runtime for Lucid.Rtc (Windows ARM64)</Description>
     <PackageTags>webrtc;lucid;rtc;native;win-arm64</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('win-arm64\native\lucid_rtc.dll')">
     <None Include="win-arm64\native\lucid_rtc.dll">
       <Pack>true</Pack>
       <PackagePath>runtimes\win-arm64\native\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

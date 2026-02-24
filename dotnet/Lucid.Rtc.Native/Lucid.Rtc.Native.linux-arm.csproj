@@ -12,18 +12,20 @@
     <Description>Native runtime for Lucid.Rtc (Linux ARM)</Description>
     <PackageTags>webrtc;lucid;rtc;native;linux-arm</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('linux-arm\native\liblucid_rtc.so')">
     <None Include="linux-arm\native\liblucid_rtc.so">
       <Pack>true</Pack>
       <PackagePath>runtimes\linux-arm\native\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
