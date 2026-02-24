@@ -4,6 +4,10 @@ Cargo.lock
 **/*.rs.bk
 *.pdb
 
+# Go / Pion
+pion/lucid_rtc.dll
+pion/lucid_rtc.h
+
 # IDE
 .idea/
 .vs/
@@ -19,6 +23,14 @@ release/
 x64/
 x86/
 ARM64/
+
+# Native libraries (built locally)
+dotnet/Lucid.Rtc.Rust/*/native/*.dll
+dotnet/Lucid.Rtc.Rust/*/native/*.so
+dotnet/Lucid.Rtc.Rust/*/native/*.dylib
+dotnet/Lucid.Rtc.Pion/*/native/*.dll
+dotnet/Lucid.Rtc.Pion/*/native/*.so
+dotnet/Lucid.Rtc.Pion/*/native/*.dylib
 
 # NuGet
 *.nupkg
