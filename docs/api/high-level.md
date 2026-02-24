@@ -53,6 +53,7 @@ Main connection class for WebRTC communication.
 |--------|------------|---------|-------------|
 | `On<T>(Action<T>)` | `handler` | `this` | Register typed event handler |
 | `Off<T>()` | - | `this` | Remove all handlers for type T |
+| `Off<T>(Action<T>)` | `handler` | `this` | Remove specific handler for type T |
 
 #### Peer Management
 
