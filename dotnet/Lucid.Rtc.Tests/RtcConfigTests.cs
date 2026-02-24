@@ -59,18 +59,19 @@ public class RtcConfigTests
         var json = JsonSerializer.Serialize(new
         {
             stun_servers = config.StunServers,
-            turn_server_url = config.TurnServerUrl,
-            turn_username = config.TurnUsername,
-            turn_password = config.TurnPassword,
-            ice_connection_timeout_ms = config.IceConnectionTimeoutMs,
+            turn_server = config.TurnServerUrl != null ? new
+            {
+                url = config.TurnServerUrl,
+                username = config.TurnUsername ?? "",
+                password = config.TurnPassword ?? ""
+            } : null,
+            ice_timeout_ms = (ulong)config.IceConnectionTimeoutMs,
             data_channel_reliable = config.DataChannelReliable
         });
 
         Assert.Contains("\"stun_servers\"", json);
-        Assert.Contains("\"turn_server_url\"", json);
-        Assert.Contains("\"turn_username\"", json);
-        Assert.Contains("\"turn_password\"", json);
-        Assert.Contains("\"ice_connection_timeout_ms\"", json);
+        Assert.Contains("\"turn_server\"", json);
+        Assert.Contains("\"ice_timeout_ms\"", json);
         Assert.Contains("\"data_channel_reliable\"", json);
     }
 

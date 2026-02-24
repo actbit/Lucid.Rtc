@@ -321,6 +321,24 @@ public sealed class RtcConnection : IAsyncDisposable
     }
 
     /// <summary>
+    /// Remove a specific handler for an event type.
+    /// </summary>
+    /// <typeparam name="T">The event type.</typeparam>
+    /// <param name="handler">The handler to remove.</param>
+    /// <returns>This connection for chaining.</returns>
+    public RtcConnection Off<T>(Action<T> handler) where T : RtcEventBase
+    {
+        if (_handlers.TryGetValue(typeof(T), out var handlers))
+        {
+            lock (handlers)
+            {
+                handlers.Remove(handler);
+            }
+        }
+        return this;
+    }
+
+    /// <summary>
     /// Create a new peer connection.
     /// </summary>
     /// <param name="peerId">The peer identifier.</param>
