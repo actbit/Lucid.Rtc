@@ -5,14 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Lucid.Rtc</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <!-- NuGet Package Metadata -->
-    <PackageId>Lucid.Rtc.Core</PackageId>
+    <PackageId>Lucid.Rtc.MessagePack</PackageId>
     <Version>0.1.0</Version>
     <Authors>Lucid.Rtc</Authors>
-    <Description>WebRTC bindings for .NET (managed library only - requires native runtime package)</Description>
-    <PackageTags>webrtc;p2p;realtime;datachannel;dotnet</PackageTags>
+    <Description>MessagePack serialization support for Lucid.Rtc</Description>
+    <PackageTags>webrtc;messagepack;serialization;lucid;rtc</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
@@ -27,13 +26,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MessagePack" Version="3.0.308" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <!-- Allow tests to access internal members -->
   <ItemGroup>
-    <InternalsVisibleTo Include="Lucid.Rtc.Tests" />
-    <InternalsVisibleTo Include="Lucid.Rtc.MessagePack" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
 </Project>
