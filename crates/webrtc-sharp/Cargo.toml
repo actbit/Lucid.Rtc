@@ -1,0 +1,18 @@
+[package]
+name = "webrtc-sharp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository = "https://github.com/yourname/webrtc-sharp"
+description = "Core WebRTC library for .NET bindings"
+
+[dependencies]
+webrtc = "0.17"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+anyhow = "1"
+base64 = "0.22"

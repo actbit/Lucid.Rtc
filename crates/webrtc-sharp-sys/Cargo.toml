@@ -1,0 +1,20 @@
+[package]
+name = "webrtc-sharp-sys"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "C FFI bindings for webrtc-sharp"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "webrtc_sharp"
+
+[dependencies]
+webrtc-sharp = { path = "../webrtc-sharp" }
+tokio.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[build-dependencies]
+cbindgen = "0.26"

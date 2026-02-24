@@ -1,0 +1,24 @@
+[workspace]
+members = [
+    "crates/webrtc-sharp",
+    "crates/webrtc-sharp-sys",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/yourname/webrtc-sharp"
+description = "WebRTC Sharp - WebRTC bindings for .NET"
+
+[workspace.dependencies]
+webrtc = "0.17"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+anyhow = "1"
+base64 = "0.22"

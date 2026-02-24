@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="dotnet\Lucid.Rtc\Lucid.Rtc.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Tests\Lucid.Rtc.Tests.csproj" Type="Regular" />
+</Solution>

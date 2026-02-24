@@ -1,0 +1,34 @@
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# IDE
+.idea/
+.vs/
+*.useros
+*.suo.doc
+
+# Build outputs
+bin/
+obj/
+[Dd]/
+debug/
+release/
+x64/
+x86/
+ARM64/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
