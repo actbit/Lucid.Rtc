@@ -131,7 +131,6 @@ func (c *Client) CreateOffer(peerId string) (string, error) {
 		peerId:   peerId,
 		events:   make([]RtcEvent, 0),
 	}
-	c.peers[peerId] = peer
 
 	// Set up data channel handler
 	pc.OnDataChannel(func(dc *webrtc.DataChannel) {
@@ -186,6 +185,7 @@ func (c *Client) CreateOffer(peerId string) (string, error) {
 	// Create data channel (offerer side)
 	dc, err := pc.CreateDataChannel("data", nil)
 	if err != nil {
+		pc.Close()
 		return "", err
 	}
 	peer.dc = dc
@@ -194,16 +194,23 @@ func (c *Client) CreateOffer(peerId string) (string, error) {
 	// Create offer
 	offer, err := pc.CreateOffer(nil)
 	if err != nil {
+		pc.Close()
 		return "", err
 	}
 
 	if err := pc.SetLocalDescription(offer); err != nil {
+		pc.Close()
 		return "", err
 	}
+
+	// Only add to peers map after successful setup
+	c.peers[peerId] = peer
 
 	// Marshal SDP
 	sdp, err := json.Marshal(offer)
 	if err != nil {
+		pc.Close()
+		delete(c.peers, peerId)
 		return "", err
 	}
 
@@ -239,7 +246,6 @@ func (c *Client) SetRemoteOffer(peerId, sdp string) (string, error) {
 		peerId:   peerId,
 		events:   make([]RtcEvent, 0),
 	}
-	c.peers[peerId] = peer
 
 	// Set up data channel handler (answerer side)
 	pc.OnDataChannel(func(dc *webrtc.DataChannel) {
@@ -293,22 +299,30 @@ func (c *Client) SetRemoteOffer(peerId, sdp string) (string, error) {
 
 	// Set remote description
 	if err := pc.SetRemoteDescription(offer); err != nil {
+		pc.Close()
 		return "", err
 	}
 
 	// Create answer
 	answer, err := pc.CreateAnswer(nil)
 	if err != nil {
+		pc.Close()
 		return "", err
 	}
 
 	if err := pc.SetLocalDescription(answer); err != nil {
+		pc.Close()
 		return "", err
 	}
+
+	// Only add to peers map after successful setup
+	c.peers[peerId] = peer
 
 	// Marshal SDP
 	answerSDP, err := json.Marshal(answer)
 	if err != nil {
+		pc.Close()
+		delete(c.peers, peerId)
 		return "", err
 	}
 

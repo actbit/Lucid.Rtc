@@ -21,17 +21,18 @@ pub struct LucidRtcClientHandle {
 /// Create a new WebRTC client.
 ///
 /// # Safety
-/// - config_json must be a valid null-terminated UTF-8 string
+/// - config_json must be a valid null-terminated UTF-8 string, or null for default config
 /// - Caller must free the returned handle using lucid_rtc_destroy_client
 #[no_mangle]
 pub unsafe extern "C" fn lucid_rtc_create_client(config_json: *const c_char) -> *mut LucidRtcClientHandle {
-    if config_json.is_null() {
-        return ptr::null_mut();
-    }
-
-    let config_str = match CStr::from_ptr(config_json).to_str() {
-        Ok(s) => s,
-        Err(_) => return ptr::null_mut(),
+    // Allow null config - use default configuration
+    let config_str = if config_json.is_null() {
+        ""
+    } else {
+        match CStr::from_ptr(config_json).to_str() {
+            Ok(s) => s,
+            Err(_) => return ptr::null_mut(),
+        }
     };
 
     let config: Config = if config_str.is_empty() {

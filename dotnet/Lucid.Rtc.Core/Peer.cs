@@ -397,7 +397,7 @@ public sealed class Peer
     /// <summary>
     /// Close the peer connection.
     /// </summary>
-    public async Task CloseAsync()
+    public Task CloseAsync()
     {
         var peerIdPtr = Marshal.StringToCoTaskMemUTF8(Id);
 
@@ -411,5 +411,7 @@ public sealed class Peer
         {
             Marshal.FreeCoTaskMem(peerIdPtr);
         }
+
+        return Task.CompletedTask;
     }
 }

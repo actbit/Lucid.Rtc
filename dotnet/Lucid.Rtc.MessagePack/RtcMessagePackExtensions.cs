@@ -57,6 +57,9 @@ public static class RtcMessagePackExtensions
     {
         connection.On<MessageReceivedEvent>(e =>
         {
+            if (e.Data == null)
+                return;
+
             try
             {
                 var value = MessagePackSerializer.Deserialize<T>(e.Data, _options);

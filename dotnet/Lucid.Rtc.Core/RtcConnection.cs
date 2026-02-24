@@ -11,7 +11,7 @@ namespace Lucid.Rtc;
 public sealed class RtcConnection : IAsyncDisposable
 {
     private readonly RtcConnectionConfig _config;
-    private readonly IntPtr _handle;
+    private IntPtr _handle;
     private readonly Thread? _pollThread;
     private volatile bool _running;
     private bool _disposed;
@@ -161,31 +161,31 @@ public sealed class RtcConnection : IAsyncDisposable
             "peer_connected" => new PeerConnectedEvent
             {
                 PeerId = peerId,
-                Peer = GetOrCreatePeer(peerId!)
+                Peer = peerId != null ? GetOrCreatePeer(peerId) : null
             },
             "peer_disconnected" => HandlePeerDisconnected(peerId),
             "message_received" => new MessageReceivedEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Data = Convert.FromBase64String(element.GetProperty("data").GetString()!)
             },
             "ice_candidate" => new IceCandidateEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Candidate = ParseIceCandidate(element.GetProperty("candidate"))
             },
             "offer_ready" => new OfferReadyEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Sdp = element.GetProperty("sdp").GetString()!
             },
             "answer_ready" => new AnswerReadyEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Sdp = element.GetProperty("sdp").GetString()!
             },
             "ice_connection_state_change" => HandleIceStateChange(peerId, element.GetProperty("state").GetString()!),
@@ -193,18 +193,18 @@ public sealed class RtcConnection : IAsyncDisposable
             "data_channel_closed" => new DataChannelClosedEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!)
+                Peer = peerId != null ? GetPeer(peerId) : null
             },
             "video_frame" => new VideoFrameEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Data = Convert.FromBase64String(element.GetProperty("data").GetString()!)
             },
             "audio_frame" => new AudioFrameEvent
             {
                 PeerId = peerId,
-                Peer = GetPeer(peerId!),
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Data = Convert.FromBase64String(element.GetProperty("data").GetString()!)
             },
             "error" => new ErrorEvent
@@ -414,6 +414,7 @@ public sealed class RtcConnection : IAsyncDisposable
         if (_handle != IntPtr.Zero)
         {
             Native.NativeMethods.lucid_rtc_destroy_client(_handle);
+            _handle = IntPtr.Zero;
         }
 
         _handlers.Clear();
