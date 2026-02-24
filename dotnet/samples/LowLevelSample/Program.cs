@@ -67,6 +67,14 @@ client.EventReceived += (sender, evt) =>
             Console.WriteLine($"[ICE状態変更] Peer: {evt.PeerId}, State: {evt.State}");
             break;
 
+        case "video_frame":
+            Console.WriteLine($"[ビデオ] Peer: {evt.PeerId}, Size: {evt.Message?.Length ?? 0} bytes");
+            break;
+
+        case "audio_frame":
+            Console.WriteLine($"[オーディオ] Peer: {evt.PeerId}, Size: {evt.Message?.Length ?? 0} bytes");
+            break;
+
         case "error":
             Console.WriteLine($"[エラー] {evt.ErrorMessage}");
             break;

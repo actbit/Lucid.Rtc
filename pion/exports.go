@@ -8,6 +8,7 @@ import "C"
 import (
 	"encoding/json"
 	"sync"
+	"time"
 	"unsafe"
 )
 
@@ -198,12 +199,21 @@ func lucid_rtc_wait_for_ice_connected(handle unsafe.Pointer, peerID *C.char) C.i
 		return -1
 	}
 
-	// For now, just return success if connected
-	// TODO: Implement proper waiting with timeout
-	if client.IsConnected(C.GoString(peerID)) {
-		return 0
+	peerIDStr := C.GoString(peerID)
+	timeout := time.After(30 * time.Second)
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-timeout:
+			return -1
+		case <-ticker.C:
+			if client.IsConnected(peerIDStr) {
+				return 0
+			}
+		}
 	}
-	return -1
 }
 
 //export lucid_rtc_close_peer
