@@ -66,7 +66,11 @@ connection
 var peer = await connection.CreatePeerAsync("remote-peer");
 
 // ===== メディア設定（チェーン可） =====
-peer.WithVideo("vp8").WithAudio("opus");
+// 列挙型を使用 (推奨)
+peer.WithVideo(VideoCodec.Vp8).WithAudio(AudioCodec.Opus);
+
+// または文字列で指定
+// peer.WithVideo("vp8").WithAudio("opus");
 
 Console.WriteLine($"Peer ID: {peer.Id}");
 Console.WriteLine($"State: {peer.State}");

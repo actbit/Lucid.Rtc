@@ -49,10 +49,10 @@ connection
     .On<MessageReceivedEvent>(e => Console.WriteLine($"メッセージ: {e.DataAsString}"))
     .On<IceCandidateEvent>(e => SendToSignaling(e.Candidate));
 
-// メディアサポート付きピア作成
+// メディアサポート付きピア作成 (列挙型を使用)
 var peer = await connection.CreatePeerAsync("remote-peer")
-    .WithVideo("vp8")
-    .WithAudio("opus");
+    .WithVideo(VideoCodec.Vp8)
+    .WithAudio(AudioCodec.Opus);
 
 // ネゴシエーション
 peer.SetRemoteOffer(offerSdp);
@@ -138,8 +138,8 @@ peer.IsVideoEnabled  // true/false
 peer.IsAudioEnabled  // true/false
 
 // 設定 (メソッドチェーン対応)
-peer.WithVideo("vp8")      // "vp8", "vp9", "h264", "av1"
-peer.WithAudio("opus")     // "opus", "pcmu", "pcma"
+peer.WithVideo(VideoCodec.Vp8)   // または "vp8", "vp9", "h264", "av1"
+peer.WithAudio(AudioCodec.Opus)  // または "opus", "pcmu", "pcma"
 
 // SDPネゴシエーション (メソッドチェーン対応)
 peer.SetRemoteOffer(sdp)
@@ -331,11 +331,11 @@ cd pion && CGO_ENABLED=1 go build -buildmode=c-shared -o lucid_rtc.dll .
 ```
 Lucid.Rtc/
 ├── crates/
-│   ├── lucid-rtc/              # Rust WebRTC実装
+│   ├── lucid-rtc/              # Rust WebRTC実装 (webrtc-rs使用)
 │   └── lucid-rtc-sys/          # FFIバインディング (C ABI)
 ├── pion/
 │   ├── go.mod
-│   ├── client.go               # Go WebRTCクライアント
+│   ├── client.go               # Go WebRTCクライアント (pion/webrtc使用)
 │   ├── exports.go              # C ABI エクスポート
 │   └── media.go                # メディアトラック対応
 ├── dotnet/
@@ -349,6 +349,11 @@ Lucid.Rtc/
 │       ├── HighLevelSample/
 │       └── LowLevelSample/
 ├── docs/api/                   # APIドキュメント
+│   ├── ja/                     # 日本語
+│   ├── high-level.md
+│   ├── low-level.md
+│   ├── types.md
+│   └── messagepack.md
 ├── build.ps1 / build.sh        # ビルドスクリプト
 └── .github/workflows/          # CI/CD
 ```

@@ -115,8 +115,10 @@ WebRTCピア接続を表します。
 
 | メソッド | パラメータ | 戻り値 | 説明 |
 |---------|-----------|--------|------|
-| `WithVideo(string)` | `codec` - "vp8", "vp9", "h264", "av1" | `this` | ビデオを有効化 |
-| `WithAudio(string)` | `codec` - "opus", "pcmu", "pcma" | `this` | オーディオを有効化 |
+| `WithVideo(VideoCodec)` | `codec` - `VideoCodec.Vp8`, `Vp9`, `H264`, `Av1` | `this` | ビデオを有効化 (列挙型) |
+| `WithVideo(string)` | `codec` - "vp8", "vp9", "h264", "av1" | `this` | ビデオを有効化 (文字列) |
+| `WithAudio(AudioCodec)` | `codec` - `AudioCodec.Opus`, `Pcmu`, `Pcma` | `this` | オーディオを有効化 (列挙型) |
+| `WithAudio(string)` | `codec` - "opus", "pcmu", "pcma" | `this` | オーディオを有効化 (文字列) |
 
 #### SDPネゴシエーション（チェーン可）
 
@@ -144,6 +146,12 @@ WebRTCピア接続を表します。
 ### 例
 
 ```csharp
+// 列挙型を使用 (推奨)
+var peer = await connection.CreatePeerAsync("remote-peer")
+    .WithVideo(VideoCodec.Vp8)
+    .WithAudio(AudioCodec.Opus);
+
+// または文字列で指定
 var peer = await connection.CreatePeerAsync("remote-peer")
     .WithVideo("vp8")
     .WithAudio("opus");
@@ -156,6 +164,27 @@ peer.SendVideo(rtpPacket);
 
 await peer.CloseAsync();
 ```
+
+---
+
+## VideoCodec
+
+| 値 | 説明 |
+|----|------|
+| `Vp8` | VP8コーデック (推奨) |
+| `Vp9` | VP9コーデック |
+| `H264` | H.264コーデック |
+| `Av1` | AV1コーデック |
+
+---
+
+## AudioCodec
+
+| 値 | 説明 |
+|----|------|
+| `Opus` | Opusコーデック (推奨) |
+| `Pcmu` | G.711 μ-law |
+| `Pcma` | G.711 A-law |
 
 ---
 

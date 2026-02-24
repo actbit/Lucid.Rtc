@@ -115,8 +115,10 @@ Represents a WebRTC peer connection.
 
 | Method | Parameters | Returns | Description |
 |--------|------------|---------|-------------|
-| `WithVideo(string)` | `codec` - "vp8", "vp9", "h264", "av1" | `this` | Enable video |
-| `WithAudio(string)` | `codec` - "opus", "pcmu", "pcma" | `this` | Enable audio |
+| `WithVideo(VideoCodec)` | `codec` - `VideoCodec.Vp8`, `Vp9`, `H264`, `Av1` | `this` | Enable video (enum) |
+| `WithVideo(string)` | `codec` - "vp8", "vp9", "h264", "av1" | `this` | Enable video (string) |
+| `WithAudio(AudioCodec)` | `codec` - `AudioCodec.Opus`, `Pcmu`, `Pcma` | `this` | Enable audio (enum) |
+| `WithAudio(string)` | `codec` - "opus", "pcmu", "pcma" | `this` | Enable audio (string) |
 
 #### SDP Negotiation (Chainable)
 
@@ -144,6 +146,12 @@ Represents a WebRTC peer connection.
 ### Example
 
 ```csharp
+// Using enums (recommended)
+var peer = await connection.CreatePeerAsync("remote-peer")
+    .WithVideo(VideoCodec.Vp8)
+    .WithAudio(AudioCodec.Opus);
+
+// Or using strings
 var peer = await connection.CreatePeerAsync("remote-peer")
     .WithVideo("vp8")
     .WithAudio("opus");
@@ -156,6 +164,27 @@ peer.SendVideo(rtpPacket);
 
 await peer.CloseAsync();
 ```
+
+---
+
+## VideoCodec
+
+| Value | Description |
+|-------|-------------|
+| `Vp8` | VP8 codec (recommended) |
+| `Vp9` | VP9 codec |
+| `H264` | H.264 codec |
+| `Av1` | AV1 codec |
+
+---
+
+## AudioCodec
+
+| Value | Description |
+|-------|-------------|
+| `Opus` | Opus codec (recommended) |
+| `Pcmu` | G.711 μ-law |
+| `Pcma` | G.711 A-law |
 
 ---
 

@@ -49,10 +49,10 @@ connection
     .On<MessageReceivedEvent>(e => Console.WriteLine($"Message: {e.DataAsString}"))
     .On<IceCandidateEvent>(e => SendToSignaling(e.Candidate));
 
-// Create peer with media support
+// Create peer with media support (using enums)
 var peer = await connection.CreatePeerAsync("remote-peer")
-    .WithVideo("vp8")
-    .WithAudio("opus");
+    .WithVideo(VideoCodec.Vp8)
+    .WithAudio(AudioCodec.Opus);
 
 // Negotiate
 peer.SetRemoteOffer(offerSdp);
@@ -138,8 +138,8 @@ peer.IsVideoEnabled  // true/false
 peer.IsAudioEnabled  // true/false
 
 // Configuration (method chaining supported)
-peer.WithVideo("vp8")      // "vp8", "vp9", "h264", "av1"
-peer.WithAudio("opus")     // "opus", "pcmu", "pcma"
+peer.WithVideo(VideoCodec.Vp8)   // or "vp8", "vp9", "h264", "av1"
+peer.WithAudio(AudioCodec.Opus)  // or "opus", "pcmu", "pcma"
 
 // SDP negotiation (method chaining supported)
 peer.SetRemoteOffer(sdp)
@@ -331,11 +331,11 @@ cd pion && CGO_ENABLED=1 go build -buildmode=c-shared -o lucid_rtc.dll .
 ```
 Lucid.Rtc/
 ├── crates/
-│   ├── lucid-rtc/              # Rust WebRTC implementation
+│   ├── lucid-rtc/              # Rust WebRTC implementation (using webrtc-rs)
 │   └── lucid-rtc-sys/          # FFI bindings (C ABI)
 ├── pion/
 │   ├── go.mod
-│   ├── client.go               # Go WebRTC client
+│   ├── client.go               # Go WebRTC client (using pion/webrtc)
 │   ├── exports.go              # C ABI exports
 │   └── media.go                # Media track support
 ├── dotnet/

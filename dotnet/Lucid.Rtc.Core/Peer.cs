@@ -5,6 +5,53 @@ using System.Text.Json;
 namespace Lucid.Rtc;
 
 /// <summary>
+/// Video codec types.
+/// </summary>
+public enum VideoCodec
+{
+    /// <summary>
+    /// VP8 codec (recommended).
+    /// </summary>
+    Vp8,
+
+    /// <summary>
+    /// VP9 codec.
+    /// </summary>
+    Vp9,
+
+    /// <summary>
+    /// H.264 codec.
+    /// </summary>
+    H264,
+
+    /// <summary>
+    /// AV1 codec.
+    /// </summary>
+    Av1
+}
+
+/// <summary>
+/// Audio codec types.
+/// </summary>
+public enum AudioCodec
+{
+    /// <summary>
+    /// Opus codec (recommended).
+    /// </summary>
+    Opus,
+
+    /// <summary>
+    /// G.711 μ-law.
+    /// </summary>
+    Pcmu,
+
+    /// <summary>
+    /// G.711 A-law.
+    /// </summary>
+    Pcma
+}
+
+/// <summary>
 /// Represents a peer connection state.
 /// </summary>
 public enum PeerState
@@ -83,6 +130,14 @@ public sealed class Peer
     /// <summary>
     /// Enable video with the specified codec.
     /// </summary>
+    /// <param name="codec">Video codec.</param>
+    /// <returns>This peer for chaining.</returns>
+    public Peer WithVideo(VideoCodec codec = VideoCodec.Vp8)
+        => WithVideo(CodecToString(codec));
+
+    /// <summary>
+    /// Enable video with the specified codec string.
+    /// </summary>
     /// <param name="codec">Video codec: "vp8", "vp9", "h264", "av1".</param>
     /// <returns>This peer for chaining.</returns>
     public Peer WithVideo(string codec = "vp8")
@@ -102,6 +157,14 @@ public sealed class Peer
     /// <summary>
     /// Enable audio with the specified codec.
     /// </summary>
+    /// <param name="codec">Audio codec.</param>
+    /// <returns>This peer for chaining.</returns>
+    public Peer WithAudio(AudioCodec codec = AudioCodec.Opus)
+        => WithAudio(CodecToString(codec));
+
+    /// <summary>
+    /// Enable audio with the specified codec string.
+    /// </summary>
     /// <param name="codec">Audio codec: "opus", "pcmu", "pcma".</param>
     /// <returns>This peer for chaining.</returns>
     public Peer WithAudio(string codec = "opus")
@@ -117,6 +180,23 @@ public sealed class Peer
         }
         return this;
     }
+
+    private static string CodecToString(VideoCodec codec) => codec switch
+    {
+        VideoCodec.Vp8 => "vp8",
+        VideoCodec.Vp9 => "vp9",
+        VideoCodec.H264 => "h264",
+        VideoCodec.Av1 => "av1",
+        _ => "vp8"
+    };
+
+    private static string CodecToString(AudioCodec codec) => codec switch
+    {
+        AudioCodec.Opus => "opus",
+        AudioCodec.Pcmu => "pcmu",
+        AudioCodec.Pcma => "pcma",
+        _ => "opus"
+    };
 
     private string? CreateMediaTrack(string kind, string codec)
     {
