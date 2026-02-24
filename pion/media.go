@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"sync"
 
@@ -207,12 +209,9 @@ var (
 	ErrTrackNotFound = &ClientError{Msg: "track not found"}
 )
 
-// Simple ID generator
+// Simple ID generator using crypto/rand
 func generateID() string {
-	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
-	b := make([]byte, 8)
-	for i := range b {
-		b[i] = chars[i%len(chars)]
-	}
-	return string(b)
+	b := make([]byte, 4)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }

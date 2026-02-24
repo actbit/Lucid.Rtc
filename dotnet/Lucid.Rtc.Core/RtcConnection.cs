@@ -209,6 +209,8 @@ public sealed class RtcConnection : IAsyncDisposable
             },
             "error" => new ErrorEvent
             {
+                PeerId = peerId,
+                Peer = peerId != null ? GetPeer(peerId) : null,
                 Message = element.GetProperty("message").GetString()!
             },
             _ => null

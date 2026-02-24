@@ -142,6 +142,49 @@ public class RtcEventTests
     }
 
     [Fact]
+    public void ParseEvents_ErrorEventWithPeerId_ParsesCorrectly()
+    {
+        var json = @"[{""type"":""error"",""peer_id"":""peer1"",""message"":""Track read error""}]";
+        var events = RtcEventConverter.ParseEvents(json);
+
+        Assert.Single(events);
+        var evt = events[0];
+        Assert.Equal("error", evt.Type);
+        Assert.Equal("peer1", evt.PeerId);
+        Assert.Equal("Track read error", evt.ErrorMessage);
+    }
+
+    [Fact]
+    public void ParseEvents_VideoFrameEvent_ParsesCorrectly()
+    {
+        var json = @"[{""type"":""video_frame"",""peer_id"":""peer1"",""data"":""AAECAw==""}]";
+        var events = RtcEventConverter.ParseEvents(json);
+
+        Assert.Single(events);
+        var evt = events[0];
+        Assert.Equal("video_frame", evt.Type);
+        Assert.Equal("peer1", evt.PeerId);
+        Assert.Equal("AAECAw==", evt.Data);
+        Assert.NotNull(evt.Message);
+        Assert.Equal(new byte[] { 0x00, 0x01, 0x02, 0x03 }, evt.Message);
+    }
+
+    [Fact]
+    public void ParseEvents_AudioFrameEvent_ParsesCorrectly()
+    {
+        var json = @"[{""type"":""audio_frame"",""peer_id"":""peer2"",""data"":""BAUG""}]";
+        var events = RtcEventConverter.ParseEvents(json);
+
+        Assert.Single(events);
+        var evt = events[0];
+        Assert.Equal("audio_frame", evt.Type);
+        Assert.Equal("peer2", evt.PeerId);
+        Assert.Equal("BAUG", evt.Data);
+        Assert.NotNull(evt.Message);
+        Assert.Equal(new byte[] { 0x04, 0x05, 0x06 }, evt.Message);
+    }
+
+    [Fact]
     public void ParseEvents_UnknownEvent_ParsesWithDefaultType()
     {
         var json = @"[{""type"":""unknown_event"",""peer_id"":""peer1""}]";

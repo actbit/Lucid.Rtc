@@ -11,14 +11,20 @@ import (
 	"unsafe"
 )
 
+// ClientHandle is an opaque handle for FFI
+type ClientHandle struct {
+	client *Client
+	id     int64
+}
+
 var (
-	clients     = make(map[int32]*Client)
-	clientsMu   sync.Mutex
-	nextClientID int32 = 1
+	clientHandles   = make(map[int64]*ClientHandle)
+	clientHandlesMu sync.Mutex
+	nextHandleID    int64 = 1
 )
 
 //export lucid_rtc_create_client
-func lucid_rtc_create_client(configJSON *C.char) int32 {
+func lucid_rtc_create_client(configJSON *C.char) unsafe.Pointer {
 	var cfg string
 	if configJSON != nil {
 		cfg = C.GoString(configJSON)
@@ -26,35 +32,47 @@ func lucid_rtc_create_client(configJSON *C.char) int32 {
 
 	client, err := NewClient(cfg)
 	if err != nil {
-		return 0
+		return nil
 	}
 
-	clientsMu.Lock()
-	id := nextClientID
-	nextClientID++
-	clients[id] = client
-	clientsMu.Unlock()
+	clientHandlesMu.Lock()
+	id := nextHandleID
+	nextHandleID++
+	handle := &ClientHandle{client: client, id: id}
+	clientHandles[id] = handle
+	clientHandlesMu.Unlock()
 
-	return id
+	// Return pointer to handle (like Rust)
+	return unsafe.Pointer(handle)
 }
 
 //export lucid_rtc_destroy_client
-func lucid_rtc_destroy_client(clientID int32) {
-	clientsMu.Lock()
-	if client, ok := clients[clientID]; ok {
-		client.Close()
-		delete(clients, clientID)
+func lucid_rtc_destroy_client(handle unsafe.Pointer) {
+	if handle == nil {
+		return
 	}
-	clientsMu.Unlock()
+
+	h := (*ClientHandle)(handle)
+	clientHandlesMu.Lock()
+	if _, ok := clientHandles[h.id]; ok {
+		h.client.Close()
+		delete(clientHandles, h.id)
+	}
+	clientHandlesMu.Unlock()
+}
+
+func getClient(handle unsafe.Pointer) *Client {
+	if handle == nil {
+		return nil
+	}
+	h := (*ClientHandle)(handle)
+	return h.client
 }
 
 //export lucid_rtc_create_offer
-func lucid_rtc_create_offer(clientID int32, peerID *C.char) *C.char {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_create_offer(handle unsafe.Pointer, peerID *C.char) *C.char {
+	client := getClient(handle)
+	if client == nil {
 		return nil
 	}
 
@@ -68,12 +86,9 @@ func lucid_rtc_create_offer(clientID int32, peerID *C.char) *C.char {
 }
 
 //export lucid_rtc_set_remote_offer
-func lucid_rtc_set_remote_offer(clientID int32, peerID, sdp *C.char) *C.char {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_set_remote_offer(handle unsafe.Pointer, peerID, sdp *C.char) *C.char {
+	client := getClient(handle)
+	if client == nil {
 		return nil
 	}
 
@@ -88,12 +103,9 @@ func lucid_rtc_set_remote_offer(clientID int32, peerID, sdp *C.char) *C.char {
 }
 
 //export lucid_rtc_set_remote_answer
-func lucid_rtc_set_remote_answer(clientID int32, peerID, sdp *C.char) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_set_remote_answer(handle unsafe.Pointer, peerID, sdp *C.char) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -108,12 +120,9 @@ func lucid_rtc_set_remote_answer(clientID int32, peerID, sdp *C.char) int32 {
 }
 
 //export lucid_rtc_add_ice_candidate
-func lucid_rtc_add_ice_candidate(clientID int32, peerID, candidate, sdpMid *C.char, sdpMlineIndex int32) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_add_ice_candidate(handle unsafe.Pointer, peerID, candidate, sdpMid *C.char, sdpMlineIndex C.int) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -132,12 +141,9 @@ func lucid_rtc_add_ice_candidate(clientID int32, peerID, candidate, sdpMid *C.ch
 }
 
 //export lucid_rtc_send_message
-func lucid_rtc_send_message(clientID int32, peerID *C.char, data *C.uchar, len C.size_t) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_send_message(handle unsafe.Pointer, peerID *C.char, data *C.uchar, len C.size_t) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -153,12 +159,9 @@ func lucid_rtc_send_message(clientID int32, peerID *C.char, data *C.uchar, len C
 }
 
 //export lucid_rtc_poll_events
-func lucid_rtc_poll_events(clientID int32) *C.char {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_poll_events(handle unsafe.Pointer) *C.char {
+	client := getClient(handle)
+	if client == nil {
 		return nil
 	}
 
@@ -167,21 +170,18 @@ func lucid_rtc_poll_events(clientID int32) *C.char {
 		return C.CString("[]")
 	}
 
-	json, err := json.Marshal(events)
+	jsonData, err := json.Marshal(events)
 	if err != nil {
 		return nil
 	}
 
-	return C.CString(string(json))
+	return C.CString(string(jsonData))
 }
 
 //export lucid_rtc_is_connected
-func lucid_rtc_is_connected(clientID int32, peerID *C.char) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_is_connected(handle unsafe.Pointer, peerID *C.char) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -192,13 +192,9 @@ func lucid_rtc_is_connected(clientID int32, peerID *C.char) int32 {
 }
 
 //export lucid_rtc_wait_for_ice_connected
-func lucid_rtc_wait_for_ice_connected(clientID int32, peerID *C.char) int32 {
-	// Simple implementation - just check if connected
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_wait_for_ice_connected(handle unsafe.Pointer, peerID *C.char) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -211,12 +207,9 @@ func lucid_rtc_wait_for_ice_connected(clientID int32, peerID *C.char) int32 {
 }
 
 //export lucid_rtc_close_peer
-func lucid_rtc_close_peer(clientID int32, peerID *C.char) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_close_peer(handle unsafe.Pointer, peerID *C.char) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -229,12 +222,9 @@ func lucid_rtc_close_peer(clientID int32, peerID *C.char) int32 {
 }
 
 //export lucid_rtc_broadcast
-func lucid_rtc_broadcast(clientID int32, data *C.uchar, len C.size_t) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_broadcast(handle unsafe.Pointer, data *C.uchar, len C.size_t) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -248,12 +238,9 @@ func lucid_rtc_broadcast(clientID int32, data *C.uchar, len C.size_t) int32 {
 }
 
 //export lucid_rtc_close_all
-func lucid_rtc_close_all(clientID int32) int32 {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_close_all(handle unsafe.Pointer) C.int {
+	client := getClient(handle)
+	if client == nil {
 		return -1
 	}
 
@@ -286,40 +273,43 @@ var versionBytes = [...]C.char{'0', '.', '1', '.', '0', '-', 'p', 'i', 'o', 'n',
 // ============================================
 
 var (
-	mediaClients     = make(map[int32]*MediaClient)
-	mediaClientsMu   sync.Mutex
-	nextMediaClientID int32 = 1000 // Start from different range
+	mediaClients   = make(map[int64]*MediaClient)
+	mediaClientsMu sync.Mutex
 )
 
 //export lucid_rtc_get_supported_codecs
 func lucid_rtc_get_supported_codecs() *C.char {
 	codecs := GetSupportedCodecs()
-	json, err := json.Marshal(codecs)
+	jsonData, err := json.Marshal(codecs)
 	if err != nil {
 		return nil
 	}
-	return C.CString(string(json))
+	return C.CString(string(jsonData))
 }
 
 //export lucid_rtc_create_media_track
-func lucid_rtc_create_media_track(clientID int32, configJSON *C.char) *C.char {
-	clientsMu.Lock()
-	client, ok := clients[clientID]
-	clientsMu.Unlock()
-
-	if !ok {
+func lucid_rtc_create_media_track(handle unsafe.Pointer, configJSON *C.char) *C.char {
+	h := (*ClientHandle)(handle)
+	if h == nil {
 		return nil
 	}
 
+	clientHandlesMu.Lock()
+	if _, ok := clientHandles[h.id]; !ok {
+		clientHandlesMu.Unlock()
+		return nil
+	}
+	clientHandlesMu.Unlock()
+
 	// Create or get media client
 	mediaClientsMu.Lock()
-	mediaClient, ok := mediaClients[clientID]
+	mediaClient, ok := mediaClients[h.id]
 	if !ok {
 		mediaClient = &MediaClient{
-			Client: client,
+			Client: h.client,
 			tracks: make(map[string]*MediaTrack),
 		}
-		mediaClients[clientID] = mediaClient
+		mediaClients[h.id] = mediaClient
 	}
 	mediaClientsMu.Unlock()
 
@@ -332,9 +322,14 @@ func lucid_rtc_create_media_track(clientID int32, configJSON *C.char) *C.char {
 }
 
 //export lucid_rtc_add_track_to_peer
-func lucid_rtc_add_track_to_peer(clientID int32, peerID, trackID *C.char) int32 {
+func lucid_rtc_add_track_to_peer(handle unsafe.Pointer, peerID, trackID *C.char) C.int {
+	h := (*ClientHandle)(handle)
+	if h == nil {
+		return -1
+	}
+
 	mediaClientsMu.Lock()
-	mediaClient, ok := mediaClients[clientID]
+	mediaClient, ok := mediaClients[h.id]
 	mediaClientsMu.Unlock()
 
 	if !ok {
@@ -350,9 +345,14 @@ func lucid_rtc_add_track_to_peer(clientID int32, peerID, trackID *C.char) int32 
 }
 
 //export lucid_rtc_send_media_data
-func lucid_rtc_send_media_data(clientID int32, trackID *C.char, data *C.uchar, len C.size_t) int32 {
+func lucid_rtc_send_media_data(handle unsafe.Pointer, trackID *C.char, data *C.uchar, len C.size_t) C.int {
+	h := (*ClientHandle)(handle)
+	if h == nil {
+		return -1
+	}
+
 	mediaClientsMu.Lock()
-	mediaClient, ok := mediaClients[clientID]
+	mediaClient, ok := mediaClients[h.id]
 	mediaClientsMu.Unlock()
 
 	if !ok {
@@ -369,9 +369,14 @@ func lucid_rtc_send_media_data(clientID int32, trackID *C.char, data *C.uchar, l
 }
 
 //export lucid_rtc_remove_media_track
-func lucid_rtc_remove_media_track(clientID int32, trackID *C.char) int32 {
+func lucid_rtc_remove_media_track(handle unsafe.Pointer, trackID *C.char) C.int {
+	h := (*ClientHandle)(handle)
+	if h == nil {
+		return -1
+	}
+
 	mediaClientsMu.Lock()
-	mediaClient, ok := mediaClients[clientID]
+	mediaClient, ok := mediaClients[h.id]
 	mediaClientsMu.Unlock()
 
 	if !ok {

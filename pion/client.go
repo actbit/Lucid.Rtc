@@ -12,14 +12,18 @@ import (
 type EventType string
 
 const (
-	EventPeerConnected          EventType = "peer_connected"
-	EventPeerDisconnected       EventType = "peer_disconnected"
-	EventMessageReceived        EventType = "message_received"
-	EventIceCandidate           EventType = "ice_candidate"
-	EventError                  EventType = "error"
-	EventDataChannelOpen        EventType = "data_channel_open"
-	EventDataChannelClosed      EventType = "data_channel_closed"
+	EventPeerConnected            EventType = "peer_connected"
+	EventPeerDisconnected         EventType = "peer_disconnected"
+	EventMessageReceived          EventType = "message_received"
+	EventIceCandidate             EventType = "ice_candidate"
+	EventError                    EventType = "error"
+	EventDataChannelOpen          EventType = "data_channel_open"
+	EventDataChannelClosed        EventType = "data_channel_closed"
 	EventIceConnectionStateChange EventType = "ice_connection_state_change"
+	EventOfferReady               EventType = "offer_ready"
+	EventAnswerReady              EventType = "answer_ready"
+	EventVideoFrame               EventType = "video_frame"
+	EventAudioFrame               EventType = "audio_frame"
 )
 
 // RtcEvent represents an event from the WebRTC client
@@ -32,6 +36,12 @@ type RtcEvent struct {
 	Sdp       string         `json:"sdp,omitempty"`
 	State     string         `json:"state,omitempty"`
 	Message   string         `json:"message,omitempty"` // for error events
+}
+
+// Sdp struct for offer/answer SDP
+type Sdp struct {
+	Type string `json:"type"`
+	Sdp  string `json:"sdp"`
 }
 
 // IceCandidate represents an ICE candidate
@@ -157,6 +167,22 @@ func (c *Client) CreateOffer(peerId string) (string, error) {
 		}
 	})
 
+	// Set up ICE connection state handler
+	pc.OnICEConnectionStateChange(func(state webrtc.ICEConnectionState) {
+		peer.eventsMu.Lock()
+		peer.events = append(peer.events, RtcEvent{
+			Type:   EventIceConnectionStateChange,
+			PeerId: peerId,
+			State:  state.String(),
+		})
+		peer.eventsMu.Unlock()
+	})
+
+	// Set up track handler for receiving media
+	pc.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+		c.handleIncomingTrack(peer, track)
+	})
+
 	// Create data channel (offerer side)
 	dc, err := pc.CreateDataChannel("data", nil)
 	if err != nil {
@@ -180,6 +206,15 @@ func (c *Client) CreateOffer(peerId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// Emit offer_ready event
+	peer.eventsMu.Lock()
+	peer.events = append(peer.events, RtcEvent{
+		Type:   EventOfferReady,
+		PeerId: peerId,
+		Sdp:    string(sdp),
+	})
+	peer.eventsMu.Unlock()
 
 	return string(sdp), nil
 }
@@ -240,6 +275,22 @@ func (c *Client) SetRemoteOffer(peerId, sdp string) (string, error) {
 		}
 	})
 
+	// Set up ICE connection state handler
+	pc.OnICEConnectionStateChange(func(state webrtc.ICEConnectionState) {
+		peer.eventsMu.Lock()
+		peer.events = append(peer.events, RtcEvent{
+			Type:   EventIceConnectionStateChange,
+			PeerId: peerId,
+			State:  state.String(),
+		})
+		peer.eventsMu.Unlock()
+	})
+
+	// Set up track handler for receiving media
+	pc.OnTrack(func(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+		c.handleIncomingTrack(peer, track)
+	})
+
 	// Set remote description
 	if err := pc.SetRemoteDescription(offer); err != nil {
 		return "", err
@@ -260,6 +311,15 @@ func (c *Client) SetRemoteOffer(peerId, sdp string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// Emit answer_ready event
+	peer.eventsMu.Lock()
+	peer.events = append(peer.events, RtcEvent{
+		Type:   EventAnswerReady,
+		PeerId: peerId,
+		Sdp:    string(answerSDP),
+	})
+	peer.eventsMu.Unlock()
 
 	return string(answerSDP), nil
 }
@@ -395,10 +455,54 @@ func (c *Client) PollEvents() []RtcEvent {
 	return allEvents
 }
 
+// handleIncomingTrack processes incoming media tracks
+func (c *Client) handleIncomingTrack(peer *PeerConnection, track *webrtc.TrackRemote) {
+	kind := track.Kind().String()
+
+	for {
+		// Read RTP packets
+		packet, _, err := track.ReadRTP()
+		if err != nil {
+			// Track closed or error
+			peer.eventsMu.Lock()
+			peer.events = append(peer.events, RtcEvent{
+				Type:    EventError,
+				PeerId:  peer.peerId,
+				Message: "track read error: " + err.Error(),
+			})
+			peer.eventsMu.Unlock()
+			return
+		}
+
+		// Determine event type based on track kind
+		var eventType EventType
+		if kind == "video" {
+			eventType = EventVideoFrame
+		} else if kind == "audio" {
+			eventType = EventAudioFrame
+		} else {
+			continue // Unknown track kind
+		}
+
+		// Emit event with base64 encoded payload
+		peer.eventsMu.Lock()
+		peer.events = append(peer.events, RtcEvent{
+			Type:   eventType,
+			PeerId: peer.peerId,
+			Data:   base64.StdEncoding.EncodeToString(packet.Payload),
+		})
+		peer.eventsMu.Unlock()
+	}
+}
+
 func (c *Client) setupDataChannel(peer *PeerConnection, dc *webrtc.DataChannel) {
 	dc.OnOpen(func() {
 		peer.eventsMu.Lock()
 		peer.connected = true
+		peer.events = append(peer.events, RtcEvent{
+			Type:   EventPeerConnected,
+			PeerId: peer.peerId,
+		})
 		peer.events = append(peer.events, RtcEvent{
 			Type:   EventDataChannelOpen,
 			PeerId: peer.peerId,
@@ -411,6 +515,10 @@ func (c *Client) setupDataChannel(peer *PeerConnection, dc *webrtc.DataChannel) 
 		peer.connected = false
 		peer.events = append(peer.events, RtcEvent{
 			Type:   EventDataChannelClosed,
+			PeerId: peer.peerId,
+		})
+		peer.events = append(peer.events, RtcEvent{
+			Type:   EventPeerDisconnected,
 			PeerId: peer.peerId,
 		})
 		peer.eventsMu.Unlock()

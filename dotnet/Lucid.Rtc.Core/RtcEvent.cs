@@ -104,6 +104,8 @@ internal sealed class RtcEventConverter
             "ice_connection_state_change" => ParseStateEvent(element, eventType),
             "data_channel_open" => ParsePeerEvent(element, eventType),
             "data_channel_closed" => ParsePeerEvent(element, eventType),
+            "video_frame" => ParseFrameEvent(element, eventType),
+            "audio_frame" => ParseFrameEvent(element, eventType),
             "error" => ParseErrorEvent(element, eventType),
             _ => new RtcEvent { Type = eventType }
         };
@@ -167,11 +169,25 @@ internal sealed class RtcEventConverter
         };
     }
 
+    private static RtcEvent ParseFrameEvent(JsonElement element, string type)
+    {
+        var base64Data = element.GetProperty("data").GetString() ?? "";
+        var frameBytes = Convert.FromBase64String(base64Data);
+        return new RtcEvent
+        {
+            Type = type,
+            PeerId = element.GetProperty("peer_id").GetString(),
+            Data = base64Data,
+            Message = frameBytes
+        };
+    }
+
     private static RtcEvent ParseErrorEvent(JsonElement element, string type)
     {
         return new RtcEvent
         {
             Type = type,
+            PeerId = element.TryGetProperty("peer_id", out var peerIdProp) ? peerIdProp.GetString() : null,
             ErrorMessage = element.GetProperty("message").GetString()
         };
     }
