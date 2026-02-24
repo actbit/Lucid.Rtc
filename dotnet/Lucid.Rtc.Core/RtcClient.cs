@@ -36,36 +36,49 @@ public sealed class RtcClient : IDisposable
     /// <param name="config">The RTC configuration.</param>
     public RtcClient(RtcConfig? config = null)
     {
-        string? configJson = null;
-        if (config != null)
+        IntPtr configPtr = IntPtr.Zero;
+        try
         {
-            // Build config JSON matching Rust Config struct format
-            var configObj = new
+            if (config != null)
             {
-                stun_servers = config.StunServers,
-                turn_server = config.TurnServerUrl != null ? new
+                // Build config JSON matching Rust Config struct format
+                var configObj = new
                 {
-                    url = config.TurnServerUrl,
-                    username = config.TurnUsername ?? "",
-                    password = config.TurnPassword ?? ""
-                } : null,
-                ice_timeout_ms = (ulong)config.IceConnectionTimeoutMs,
-                data_channel_reliable = config.DataChannelReliable
-            };
-            configJson = JsonSerializer.Serialize(configObj);
-        }
+                    stun_servers = config.StunServers,
+                    turn_server = config.TurnServerUrl != null ? new
+                    {
+                        url = config.TurnServerUrl,
+                        username = config.TurnUsername ?? "",
+                        password = config.TurnPassword ?? ""
+                    } : null,
+                    ice_timeout_ms = (ulong)config.IceConnectionTimeoutMs,
+                    data_channel_reliable = config.DataChannelReliable
+                };
+                var configJson = JsonSerializer.Serialize(configObj);
+                configPtr = Marshal.StringToCoTaskMemUTF8(configJson);
+            }
 
-        _handle = NativeMethods.webrtc_sharp_create_client(configJson);
+            _handle = NativeMethods.lucid_rtc_create_client(configPtr);
 
-        if (_handle != IntPtr.Zero)
-        {
-            _running = true;
-            _pollThread = new Thread(PollLoop)
+            if (_handle != IntPtr.Zero)
             {
-                IsBackground = true,
-                Name = "RtcClient Poll Thread"
-            };
-            _pollThread.Start();
+                _running = true;
+                _pollThread = new Thread(PollLoop)
+                {
+                    IsBackground = true,
+                    Name = "Lucid.Rtc Poll Thread"
+                };
+                _pollThread.Start();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("[Lucid.Rtc] Native library not available or initialization failed");
+            }
+        }
+        finally
+        {
+            if (configPtr != IntPtr.Zero)
+                Marshal.FreeCoTaskMem(configPtr);
         }
     }
 
@@ -75,11 +88,11 @@ public sealed class RtcClient : IDisposable
         {
             try
             {
-                var eventsPtr = NativeMethods.webrtc_sharp_poll_events(_handle);
+                var eventsPtr = NativeMethods.lucid_rtc_poll_events(_handle);
                 if (eventsPtr != IntPtr.Zero)
                 {
                     var json = Marshal.PtrToStringUTF8(eventsPtr);
-                    NativeMethods.webrtc_sharp_free_string(eventsPtr);
+                    NativeMethods.lucid_rtc_free_string(eventsPtr);
 
                     if (!string.IsNullOrEmpty(json))
                     {
@@ -100,7 +113,7 @@ public sealed class RtcClient : IDisposable
             catch (Exception ex)
             {
                 // Log error but continue polling
-                System.Diagnostics.Debug.WriteLine($"[RtcClient] Poll error: {ex}");
+                System.Diagnostics.Debug.WriteLine($"[Lucid.Rtc] Poll error: {ex}");
             }
 
             Thread.Sleep(_pollIntervalMs);
@@ -112,8 +125,15 @@ public sealed class RtcClient : IDisposable
     /// </summary>
     public static string GetVersion()
     {
-        var ptr = NativeMethods.webrtc_sharp_version();
-        return Marshal.PtrToStringUTF8(ptr) ?? "unknown";
+        try
+        {
+            var ptr = NativeMethods.lucid_rtc_version();
+            return Marshal.PtrToStringUTF8(ptr) ?? "unknown";
+        }
+        catch
+        {
+            return "native-unavailable";
+        }
     }
 
     /// <summary>
@@ -125,13 +145,21 @@ public sealed class RtcClient : IDisposable
     {
         ThrowIfDisposed();
 
-        var ptr = NativeMethods.webrtc_sharp_create_offer(_handle, peerId);
-        if (ptr == IntPtr.Zero)
-            return null;
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        try
+        {
+            var ptr = NativeMethods.lucid_rtc_create_offer(_handle, peerIdPtr);
+            if (ptr == IntPtr.Zero)
+                return null;
 
-        var sdp = Marshal.PtrToStringUTF8(ptr);
-        NativeMethods.webrtc_sharp_free_string(ptr);
-        return sdp;
+            var sdp = Marshal.PtrToStringUTF8(ptr);
+            NativeMethods.lucid_rtc_free_string(ptr);
+            return sdp;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+        }
     }
 
     /// <summary>
@@ -144,13 +172,23 @@ public sealed class RtcClient : IDisposable
     {
         ThrowIfDisposed();
 
-        var ptr = NativeMethods.webrtc_sharp_set_remote_offer(_handle, peerId, sdp);
-        if (ptr == IntPtr.Zero)
-            return null;
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        var sdpPtr = Marshal.StringToCoTaskMemUTF8(sdp);
+        try
+        {
+            var ptr = NativeMethods.lucid_rtc_set_remote_offer(_handle, peerIdPtr, sdpPtr);
+            if (ptr == IntPtr.Zero)
+                return null;
 
-        var answer = Marshal.PtrToStringUTF8(ptr);
-        NativeMethods.webrtc_sharp_free_string(ptr);
-        return answer;
+            var answer = Marshal.PtrToStringUTF8(ptr);
+            NativeMethods.lucid_rtc_free_string(ptr);
+            return answer;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+            Marshal.FreeCoTaskMem(sdpPtr);
+        }
     }
 
     /// <summary>
@@ -162,7 +200,18 @@ public sealed class RtcClient : IDisposable
     public bool SetRemoteAnswer(string peerId, string sdp)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_set_remote_answer(_handle, peerId, sdp) == 0;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        var sdpPtr = Marshal.StringToCoTaskMemUTF8(sdp);
+        try
+        {
+            return NativeMethods.lucid_rtc_set_remote_answer(_handle, peerIdPtr, sdpPtr) == 0;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+            Marshal.FreeCoTaskMem(sdpPtr);
+        }
     }
 
     /// <summary>
@@ -176,7 +225,20 @@ public sealed class RtcClient : IDisposable
     public bool AddIceCandidate(string peerId, string candidate, string sdpMid, int sdpMlineIndex)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_add_ice_candidate(_handle, peerId, candidate, sdpMid, sdpMlineIndex) == 0;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        var candidatePtr = Marshal.StringToCoTaskMemUTF8(candidate);
+        var sdpMidPtr = Marshal.StringToCoTaskMemUTF8(sdpMid);
+        try
+        {
+            return NativeMethods.lucid_rtc_add_ice_candidate(_handle, peerIdPtr, candidatePtr, sdpMidPtr, sdpMlineIndex) == 0;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+            Marshal.FreeCoTaskMem(candidatePtr);
+            Marshal.FreeCoTaskMem(sdpMidPtr);
+        }
     }
 
     /// <summary>
@@ -199,7 +261,16 @@ public sealed class RtcClient : IDisposable
     public bool SendMessage(string peerId, byte[] data)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_send_message(_handle, peerId, data, (nuint)data.Length) == 0;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        try
+        {
+            return NativeMethods.lucid_rtc_send_message(_handle, peerIdPtr, data, (nuint)data.Length) == 0;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+        }
     }
 
     /// <summary>
@@ -221,7 +292,16 @@ public sealed class RtcClient : IDisposable
     public bool IsConnected(string peerId)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_is_connected(_handle, peerId) == 1;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        try
+        {
+            return NativeMethods.lucid_rtc_is_connected(_handle, peerIdPtr) == 1;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+        }
     }
 
     /// <summary>
@@ -232,7 +312,16 @@ public sealed class RtcClient : IDisposable
     public bool WaitForIceConnected(string peerId)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_wait_for_ice_connected(_handle, peerId) == 0;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        try
+        {
+            return NativeMethods.lucid_rtc_wait_for_ice_connected(_handle, peerIdPtr) == 0;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+        }
     }
 
     /// <summary>
@@ -243,7 +332,16 @@ public sealed class RtcClient : IDisposable
     public bool ClosePeer(string peerId)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_close_peer(_handle, peerId) == 0;
+
+        var peerIdPtr = Marshal.StringToCoTaskMemUTF8(peerId);
+        try
+        {
+            return NativeMethods.lucid_rtc_close_peer(_handle, peerIdPtr) == 0;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(peerIdPtr);
+        }
     }
 
     /// <summary>
@@ -254,7 +352,7 @@ public sealed class RtcClient : IDisposable
     public bool Broadcast(byte[] data)
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_broadcast(_handle, data, (nuint)data.Length) == 0;
+        return NativeMethods.lucid_rtc_broadcast(_handle, data, (nuint)data.Length) == 0;
     }
 
     /// <summary>
@@ -274,7 +372,7 @@ public sealed class RtcClient : IDisposable
     public bool CloseAllPeers()
     {
         ThrowIfDisposed();
-        return NativeMethods.webrtc_sharp_close_all(_handle) == 0;
+        return NativeMethods.lucid_rtc_close_all(_handle) == 0;
     }
 
     /// <summary>
@@ -318,10 +416,10 @@ public sealed class RtcClient : IDisposable
             // Wait for poll thread with longer timeout
             if (_pollThread != null && !_pollThread.Join(5000))
             {
-                System.Diagnostics.Debug.WriteLine("[RtcClient] Warning: Poll thread did not exit gracefully");
+                System.Diagnostics.Debug.WriteLine("[Lucid.Rtc] Warning: Poll thread did not exit gracefully");
             }
 
-            NativeMethods.webrtc_sharp_destroy_client(_handle);
+            NativeMethods.lucid_rtc_destroy_client(_handle);
             _handle = IntPtr.Zero;
         }
     }

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <PackageId>Lucid.Rtc.Native.linux-x64</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Lucid.Rtc</Authors>
+    <Description>Native runtime for Lucid.Rtc (Linux x64)</Description>
+    <PackageTags>webrtc;lucid;rtc;native;linux-x64</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('linux-x64\native\liblucid_rtc.so')">
+    <None Include="linux-x64\native\liblucid_rtc.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\linux-x64\native\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

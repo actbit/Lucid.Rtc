@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <PackageId>Lucid.Rtc.Native.linux-arm</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Lucid.Rtc</Authors>
+    <Description>Native runtime for Lucid.Rtc (Linux ARM)</Description>
+    <PackageTags>webrtc;lucid;rtc;native;linux-arm</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('linux-arm\native\liblucid_rtc.so')">
+    <None Include="linux-arm\native\liblucid_rtc.so">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\linux-arm\native\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

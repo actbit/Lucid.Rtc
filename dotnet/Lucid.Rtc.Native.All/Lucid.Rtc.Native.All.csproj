@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Package metadata -->
+    <PackageId>Lucid.Rtc.Native.All</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Lucid.Rtc</Authors>
+    <Description>Native runtime package for Lucid.Rtc (all platforms). Contains native libraries for all supported platforms.</Description>
+    <PackageTags>webrtc;lucid;rtc;native;cross-platform</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!-- Reference all platform-specific native packages -->
+  <ItemGroup>
+    <PackageReference Include="Lucid.Rtc.Native.win-x64" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.win-arm64" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.win-x86" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.linux-x64" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.linux-arm64" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.linux-arm" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.osx-x64" Version="0.1.0" />
+    <PackageReference Include="Lucid.Rtc.Native.osx-arm64" Version="0.1.0" />
+  </ItemGroup>
+
+</Project>

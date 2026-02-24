@@ -1,6 +1,6 @@
-//! C FFI bindings for WebRTC Sharp.
+//! C FFI bindings for Lucid.Rtc.
 //!
-//! This library provides a C-compatible API for the WebRTC Sharp library.
+//! This library provides a C-compatible API for the Lucid.Rtc WebRTC library.
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -8,12 +8,12 @@ use std::ptr;
 use std::slice;
 
 use tokio::runtime::Runtime;
-use webrtc_sharp::prelude::*;
+use lucid_rtc::prelude::*;
 
 mod helpers;
 
 /// Opaque handle to WebRTC client
-pub struct WebRtcClientHandle {
+pub struct LucidRtcClientHandle {
     inner: WebRtcClient,
     runtime: Runtime,
 }
@@ -22,9 +22,9 @@ pub struct WebRtcClientHandle {
 ///
 /// # Safety
 /// - config_json must be a valid null-terminated UTF-8 string
-/// - Caller must free the returned handle using webrtc_sharp_destroy_client
+/// - Caller must free the returned handle using lucid_rtc_destroy_client
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_create_client(config_json: *const c_char) -> *mut WebRtcClientHandle {
+pub unsafe extern "C" fn lucid_rtc_create_client(config_json: *const c_char) -> *mut LucidRtcClientHandle {
     if config_json.is_null() {
         return ptr::null_mut();
     }
@@ -53,7 +53,7 @@ pub unsafe extern "C" fn webrtc_sharp_create_client(config_json: *const c_char) 
         Err(_) => return ptr::null_mut(),
     };
 
-    Box::into_raw(Box::new(WebRtcClientHandle {
+    Box::into_raw(Box::new(LucidRtcClientHandle {
         inner: client,
         runtime,
     }))
@@ -62,10 +62,10 @@ pub unsafe extern "C" fn webrtc_sharp_create_client(config_json: *const c_char) 
 /// Destroy a WebRTC client handle.
 ///
 /// # Safety
-/// - handle must be a valid pointer returned by webrtc_sharp_create_client
+/// - handle must be a valid pointer returned by lucid_rtc_create_client
 /// - handle must not be used after this call
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_destroy_client(handle: *mut WebRtcClientHandle) {
+pub unsafe extern "C" fn lucid_rtc_destroy_client(handle: *mut LucidRtcClientHandle) {
     if handle.is_null() {
         return;
     }
@@ -79,14 +79,14 @@ pub unsafe extern "C" fn webrtc_sharp_destroy_client(handle: *mut WebRtcClientHa
 /// Create an offer for a peer connection.
 ///
 /// Returns a JSON string containing the SDP offer.
-/// Caller must free the returned string using webrtc_sharp_free_string.
+/// Caller must free the returned string using lucid_rtc_free_string.
 ///
 /// # Safety
 /// - handle must be a valid pointer
 /// - peer_id must be a valid null-terminated UTF-8 string
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_create_offer(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_create_offer(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
 ) -> *mut c_char {
     if handle.is_null() || peer_id.is_null() {
@@ -110,14 +110,14 @@ pub unsafe extern "C" fn webrtc_sharp_create_offer(
 /// Set remote offer and create an answer.
 ///
 /// Returns the SDP answer string.
-/// Caller must free the returned string using webrtc_sharp_free_string.
+/// Caller must free the returned string using lucid_rtc_free_string.
 ///
 /// # Safety
 /// - handle must be a valid pointer
 /// - peer_id and sdp must be valid null-terminated UTF-8 strings
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_set_remote_offer(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_set_remote_offer(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
     sdp: *const c_char,
 ) -> *mut c_char {
@@ -151,8 +151,8 @@ pub unsafe extern "C" fn webrtc_sharp_set_remote_offer(
 /// - handle must be a valid pointer
 /// - peer_id and sdp must be valid null-terminated UTF-8 strings
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_set_remote_answer(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_set_remote_answer(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
     sdp: *const c_char,
 ) -> i32 {
@@ -186,8 +186,8 @@ pub unsafe extern "C" fn webrtc_sharp_set_remote_answer(
 /// - handle must be a valid pointer
 /// - peer_id, candidate, and sdp_mid must be valid null-terminated UTF-8 strings
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_add_ice_candidate(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_add_ice_candidate(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
     candidate: *const c_char,
     sdp_mid: *const c_char,
@@ -233,8 +233,8 @@ pub unsafe extern "C" fn webrtc_sharp_add_ice_candidate(
 /// - peer_id must be a valid null-terminated UTF-8 string
 /// - data must be a valid pointer to len bytes
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_send_message(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_send_message(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
     data: *const u8,
     len: usize,
@@ -261,12 +261,12 @@ pub unsafe extern "C" fn webrtc_sharp_send_message(
 /// Poll for events.
 ///
 /// Returns a JSON array of events.
-/// Caller must free the returned string using webrtc_sharp_free_string.
+/// Caller must free the returned string using lucid_rtc_free_string.
 ///
 /// # Safety
 /// - handle must be a valid pointer
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_poll_events(handle: *mut WebRtcClientHandle) -> *mut c_char {
+pub unsafe extern "C" fn lucid_rtc_poll_events(handle: *mut LucidRtcClientHandle) -> *mut c_char {
     if handle.is_null() {
         return ptr::null_mut();
     }
@@ -290,8 +290,8 @@ pub unsafe extern "C" fn webrtc_sharp_poll_events(handle: *mut WebRtcClientHandl
 /// - handle must be a valid pointer
 /// - peer_id must be a valid null-terminated UTF-8 string
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_is_connected(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_is_connected(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
 ) -> i32 {
     if handle.is_null() || peer_id.is_null() {
@@ -321,8 +321,8 @@ pub unsafe extern "C" fn webrtc_sharp_is_connected(
 /// - handle must be a valid pointer
 /// - peer_id must be a valid null-terminated UTF-8 string
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_wait_for_ice_connected(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_wait_for_ice_connected(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
 ) -> i32 {
     if handle.is_null() || peer_id.is_null() {
@@ -351,8 +351,8 @@ pub unsafe extern "C" fn webrtc_sharp_wait_for_ice_connected(
 /// - handle must be a valid pointer
 /// - peer_id must be a valid null-terminated UTF-8 string
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_close_peer(
-    handle: *mut WebRtcClientHandle,
+pub unsafe extern "C" fn lucid_rtc_close_peer(
+    handle: *mut LucidRtcClientHandle,
     peer_id: *const c_char,
 ) -> i32 {
     if handle.is_null() || peer_id.is_null() {
@@ -373,13 +373,65 @@ pub unsafe extern "C" fn webrtc_sharp_close_peer(
     })
 }
 
+/// Broadcast a message to all connected peers.
+///
+/// Returns 0 on success, -1 on error.
+///
+/// # Safety
+/// - handle must be a valid pointer
+/// - data must be a valid pointer to len bytes
+#[no_mangle]
+pub unsafe extern "C" fn lucid_rtc_broadcast(
+    handle: *mut LucidRtcClientHandle,
+    data: *const u8,
+    len: usize,
+) -> i32 {
+    if handle.is_null() || data.is_null() {
+        return -1;
+    }
+
+    let handle = &*handle;
+    let data_slice = slice::from_raw_parts(data, len);
+
+    handle.runtime.block_on(async {
+        match handle.inner.broadcast(data_slice).await {
+            Ok(()) => 0,
+            Err(_) => -1,
+        }
+    })
+}
+
+/// Close all peer connections.
+///
+/// Returns 0 on success, -1 on error.
+///
+/// # Safety
+/// - handle must be a valid pointer
+#[no_mangle]
+pub unsafe extern "C" fn lucid_rtc_close_all(
+    handle: *mut LucidRtcClientHandle,
+) -> i32 {
+    if handle.is_null() {
+        return -1;
+    }
+
+    let handle = &*handle;
+
+    handle.runtime.block_on(async {
+        match handle.inner.close().await {
+            Ok(()) => 0,
+            Err(_) => -1,
+        }
+    })
+}
+
 /// Free a string allocated by this library.
 ///
 /// # Safety
-/// - s must be a pointer returned by one of the webrtc_sharp_* functions
+/// - s must be a pointer returned by one of the lucid_rtc_* functions
 /// - s must not be used after this call
 #[no_mangle]
-pub unsafe extern "C" fn webrtc_sharp_free_string(s: *mut c_char) {
+pub unsafe extern "C" fn lucid_rtc_free_string(s: *mut c_char) {
     if s.is_null() {
         return;
     }
@@ -390,7 +442,7 @@ pub unsafe extern "C" fn webrtc_sharp_free_string(s: *mut c_char) {
 ///
 /// Returns a version string (does not need to be freed).
 #[no_mangle]
-pub extern "C" fn webrtc_sharp_version() -> *const c_char {
+pub extern "C" fn lucid_rtc_version() -> *const c_char {
     static VERSION: &[u8] = b"0.1.0\0";
     VERSION.as_ptr() as *const c_char
 }

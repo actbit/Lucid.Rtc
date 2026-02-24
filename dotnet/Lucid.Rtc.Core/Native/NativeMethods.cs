@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 namespace Lucid.Rtc.Native;
 
 /// <summary>
-/// Native FFI methods for WebRTC Sharp library.
+/// Native FFI methods for Lucid.Rtc library.
 /// </summary>
 internal static class NativeMethods
 {
-    private const string DllName = "webrtc_sharp";
+    private const string DllName = "lucid_rtc";
 
     static NativeMethods()
     {
@@ -54,71 +54,72 @@ internal static class NativeMethods
         {
             Architecture.X64 when RuntimeInformation.IsOSPlatform(OSPlatform.Windows) => "win-x64",
             Architecture.Arm64 when RuntimeInformation.IsOSPlatform(OSPlatform.Windows) => "win-arm64",
+            Architecture.X86 when RuntimeInformation.IsOSPlatform(OSPlatform.Windows) => "win-x86",
             Architecture.X64 when RuntimeInformation.IsOSPlatform(OSPlatform.Linux) => "linux-x64",
             Architecture.Arm64 when RuntimeInformation.IsOSPlatform(OSPlatform.Linux) => "linux-arm64",
+            Architecture.Arm when RuntimeInformation.IsOSPlatform(OSPlatform.Linux) => "linux-arm",
             Architecture.X64 when RuntimeInformation.IsOSPlatform(OSPlatform.OSX) => "osx-x64",
             Architecture.Arm64 when RuntimeInformation.IsOSPlatform(OSPlatform.OSX) => "osx-arm64",
             _ => "unknown"
         };
 
     private static string GetNativeFileName() =>
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "webrtc_sharp.dll" :
-        RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "libwebrtc_sharp.so" :
-        "libwebrtc_sharp.dylib";
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "lucid_rtc.dll" :
+        RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "liblucid_rtc.so" :
+        "liblucid_rtc.dylib";
 
     // Client lifecycle
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr webrtc_sharp_create_client([MarshalAs(UnmanagedType.LPUTF8Str)] string? configJson);
+    internal static extern IntPtr lucid_rtc_create_client(IntPtr configJson);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void webrtc_sharp_destroy_client(IntPtr handle);
+    internal static extern void lucid_rtc_destroy_client(IntPtr handle);
 
     // SDP negotiation
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr webrtc_sharp_create_offer(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId);
+    internal static extern IntPtr lucid_rtc_create_offer(IntPtr handle, IntPtr peerId);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr webrtc_sharp_set_remote_offer(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId, [MarshalAs(UnmanagedType.LPUTF8Str)] string sdp);
+    internal static extern IntPtr lucid_rtc_set_remote_offer(IntPtr handle, IntPtr peerId, IntPtr sdp);
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_set_remote_answer(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId, [MarshalAs(UnmanagedType.LPUTF8Str)] string sdp);
+    internal static extern int lucid_rtc_set_remote_answer(IntPtr handle, IntPtr peerId, IntPtr sdp);
 
     // ICE candidates
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_add_ice_candidate(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId, [MarshalAs(UnmanagedType.LPUTF8Str)] string candidate, [MarshalAs(UnmanagedType.LPUTF8Str)] string sdpMid, int sdpMlineIndex);
+    internal static extern int lucid_rtc_add_ice_candidate(IntPtr handle, IntPtr peerId, IntPtr candidate, IntPtr sdpMid, int sdpMlineIndex);
 
     // Messaging
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_send_message(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId, byte[] data, nuint len);
-
-    // Events
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr webrtc_sharp_poll_events(IntPtr handle);
-
-    // Connection state
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_is_connected(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId);
-
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_wait_for_ice_connected(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId);
-
-    // Peer management
-    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_close_peer(IntPtr handle, [MarshalAs(UnmanagedType.LPUTF8Str)] string peerId);
+    internal static extern int lucid_rtc_send_message(IntPtr handle, IntPtr peerId, byte[] data, nuint len);
 
     // Broadcast
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_broadcast(IntPtr handle, byte[] data, nuint len);
+    internal static extern int lucid_rtc_broadcast(IntPtr handle, byte[] data, nuint len);
 
-    // Close all peers
+    // Events
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int webrtc_sharp_close_all(IntPtr handle);
+    internal static extern IntPtr lucid_rtc_poll_events(IntPtr handle);
+
+    // Connection state
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_is_connected(IntPtr handle, IntPtr peerId);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_wait_for_ice_connected(IntPtr handle, IntPtr peerId);
+
+    // Peer management
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_close_peer(IntPtr handle, IntPtr peerId);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_close_all(IntPtr handle);
 
     // Memory management
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void webrtc_sharp_free_string(IntPtr s);
+    internal static extern void lucid_rtc_free_string(IntPtr s);
 
     // Version
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern IntPtr webrtc_sharp_version();
+    internal static extern IntPtr lucid_rtc_version();
 }

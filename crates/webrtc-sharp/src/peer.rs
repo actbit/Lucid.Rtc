@@ -6,6 +6,7 @@ use std::time::Duration;
 
 use tokio::sync::{mpsc, Mutex, RwLock};
 use webrtc::api::APIBuilder;
+use webrtc::data_channel::data_channel_init::RTCDataChannelInit;
 use webrtc::data_channel::RTCDataChannel;
 use webrtc::ice_transport::ice_candidate::RTCIceCandidateInit;
 use webrtc::ice_transport::ice_connection_state::RTCIceConnectionState;
@@ -20,7 +21,7 @@ use crate::signaling::{Event, IceCandidate};
 /// Internal peer state
 struct PeerState {
     connection: Arc<webrtc::peer_connection::RTCPeerConnection>,
-    data_channel: Option<Arc<RTCDataChannel>>,
+    data_channel: Arc<Mutex<Option<Arc<RTCDataChannel>>>>,
 }
 
 /// WebRTC Client for peer-to-peer communication
@@ -115,9 +116,16 @@ impl WebRtcClient {
 
         let peer_connection = self.api.new_peer_connection(config).await?;
 
-        // Create data channel
+        // Create data channel with configuration
+        let mut dc_config = RTCDataChannelInit::default();
+        dc_config.ordered = Some(self.config.data_channel_reliable);
+        if !self.config.data_channel_reliable {
+            // For unreliable channels, set max retransmits
+            dc_config.max_retransmits = Some(0);
+        }
+
         let dc = peer_connection
-            .create_data_channel("data", None)
+            .create_data_channel("data", Some(dc_config))
             .await?;
 
         // Set up data channel handlers
@@ -203,12 +211,13 @@ impl WebRtcClient {
         peer_connection.set_local_description(offer).await?;
 
         // Store peer state
+        let data_channel_arc = Arc::new(Mutex::new(Some(dc.clone())));
         let mut peers = self.peers.write().await;
         peers.insert(
             peer_id.to_string(),
             PeerState {
                 connection: Arc::new(peer_connection),
-                data_channel: Some(dc),
+                data_channel: data_channel_arc,
             },
         );
 
@@ -233,12 +242,24 @@ impl WebRtcClient {
 
         let peer_connection = self.api.new_peer_connection(config).await?;
 
+        // Create a shared reference to store the data channel
+        let data_channel_ref: Arc<Mutex<Option<Arc<RTCDataChannel>>>> = Arc::new(Mutex::new(None));
+        let data_channel_ref_clone = data_channel_ref.clone();
+
         // Set up data channel handler for incoming channels
         let peer_id_owned = peer_id.to_string();
         let event_tx = self.event_tx.clone();
         peer_connection.on_data_channel(Box::new(move |dc| {
             let peer_id = peer_id_owned.clone();
             let tx = event_tx.clone();
+            let dc_ref = data_channel_ref_clone.clone();
+
+            // Store the data channel reference
+            let dc_clone = dc.clone();
+            tokio::spawn(async move {
+                let mut dc_lock = dc_ref.lock().await;
+                *dc_lock = Some(dc_clone);
+            });
 
             let peer_id_inner = peer_id.clone();
             let tx_inner = tx.clone();
@@ -334,7 +355,7 @@ impl WebRtcClient {
             peer_id.to_string(),
             PeerState {
                 connection: Arc::new(peer_connection),
-                data_channel: None, // Will be set when data channel opens
+                data_channel: data_channel_ref,
             },
         );
 
@@ -401,7 +422,8 @@ impl WebRtcClient {
             .get(peer_id)
             .ok_or_else(|| Error::PeerNotFound(peer_id.to_string()))?;
 
-        if let Some(dc) = &peer_state.data_channel {
+        let dc_lock = peer_state.data_channel.lock().await;
+        if let Some(dc) = dc_lock.as_ref() {
             dc.send(&data.to_vec().into()).await?;
         } else {
             return Err(Error::DataChannel("No data channel available".to_string()));
@@ -416,7 +438,8 @@ impl WebRtcClient {
         let mut errors = Vec::new();
 
         for (peer_id, peer_state) in peers.iter() {
-            if let Some(dc) = &peer_state.data_channel {
+            let dc_lock = peer_state.data_channel.lock().await;
+            if let Some(dc) = dc_lock.as_ref() {
                 if let Err(e) = dc.send(&data.to_vec().into()).await {
                     errors.push(format!("{}: {}", peer_id, e));
                 }

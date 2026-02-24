@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc\Lucid.Rtc.csproj" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
 </Project>

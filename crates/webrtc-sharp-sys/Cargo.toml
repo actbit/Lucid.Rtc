@@ -1,16 +1,16 @@
 [package]
-name = "webrtc-sharp-sys"
+name = "lucid-rtc-sys"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "C FFI bindings for webrtc-sharp"
+description = "C FFI bindings for Lucid.Rtc"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
-name = "webrtc_sharp"
+name = "lucid_rtc"
 
 [dependencies]
-webrtc-sharp = { path = "../webrtc-sharp" }
+lucid-rtc = { path = "../webrtc-sharp" }
 tokio.workspace = true
 serde_json.workspace = true
 tracing.workspace = true

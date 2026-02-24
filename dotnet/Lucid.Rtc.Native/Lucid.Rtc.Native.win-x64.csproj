@@ -7,27 +7,29 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
     <!-- Package metadata -->
-    <PackageId>Lucid.Rtc</PackageId>
+    <PackageId>Lucid.Rtc.Native.win-x64</PackageId>
     <Version>0.1.0</Version>
     <Authors>Lucid.Rtc</Authors>
-    <Description>WebRTC bindings for .NET with native P2P communication support. This metapackage includes everything you need to get started.</Description>
-    <PackageTags>webrtc;p2p;realtime;datachannel;dotnet</PackageTags>
+    <Description>Native runtime for Lucid.Rtc (Windows x64)</Description>
+    <PackageTags>webrtc;lucid;rtc;native;win-x64</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <!-- Include README -->
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="" Condition="Exists('README.md')" />
-  </ItemGroup>
-
-  <!-- Dependencies -->
+  <!-- Core dependency -->
   <ItemGroup>
     <PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
-    <PackageReference Include="Lucid.Rtc.Native.All" Version="0.1.0" />
+  </ItemGroup>
+
+  <!-- Native library -->
+  <ItemGroup Condition="Exists('win-x64\native\lucid_rtc.dll')">
+    <None Include="win-x64\native\lucid_rtc.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes\win-x64\native\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

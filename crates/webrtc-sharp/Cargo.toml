@@ -1,10 +1,10 @@
 [package]
-name = "webrtc-sharp"
+name = "lucid-rtc"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-repository = "https://github.com/yourname/webrtc-sharp"
-description = "Core WebRTC library for .NET bindings"
+repository = "https://github.com/actbit/Lucid.Rtc"
+description = "Core Lucid.Rtc WebRTC library"
 
 [dependencies]
 webrtc = "0.17"

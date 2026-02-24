@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "crates/webrtc-sharp",
-    "crates/webrtc-sharp-sys",
+    "crates/lucid-rtc",
+    "crates/lucid-rtc-sys",
 ]
 resolver = "2"
 
@@ -9,8 +9,8 @@ resolver = "2"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/yourname/webrtc-sharp"
-description = "WebRTC Sharp - WebRTC bindings for .NET"
+repository = "https://github.com/actbit/Lucid.Rtc"
+description = "Lucid.Rtc - WebRTC bindings for .NET"
 
 [workspace.dependencies]
 webrtc = "0.17"
