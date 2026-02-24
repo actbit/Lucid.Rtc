@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-    <PackageId>Lucid.Rtc.Native.osx-x64</PackageId>
+    <PackageId>Lucid.Rtc.Rust.win-x64</PackageId>
     <Version>0.1.0</Version>
-    <Authors>Lucid.Rtc</Authors>
-    <Description>Native runtime for Lucid.Rtc (macOS x64)</Description>
-    <PackageTags>webrtc;lucid;rtc;native;osx-x64</PackageTags>
+    <Authors>actbit</Authors>
+    <Description>Native runtime for Lucid.Rtc - Rust backend (Windows x64)</Description>
+    <PackageTags>webrtc;lucid;rtc;native;rust;win-x64</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
@@ -21,10 +21,10 @@
     <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('osx-x64\native\liblucid_rtc.dylib')">
-    <None Include="osx-x64\native\liblucid_rtc.dylib">
+  <ItemGroup Condition="Exists('win-x64\native\lucid_rtc.dll')">
+    <None Include="win-x64\native\lucid_rtc.dll">
       <Pack>true</Pack>
-      <PackagePath>runtimes\osx-x64\native\</PackagePath>
+      <PackagePath>runtimes\win-x64\native\</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

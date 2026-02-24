@@ -10,7 +10,7 @@ namespace Lucid.Rtc;
 /// <summary>
 /// WebRTC client for peer-to-peer communication.
 /// </summary>
-public sealed class RtcClient : IDisposable
+public class RtcClient : IDisposable
 {
     private IntPtr _handle;
     private Thread? _pollThread;
@@ -19,6 +19,11 @@ public sealed class RtcClient : IDisposable
     private readonly int _pollIntervalMs = 10;
     private readonly object _disposeLock = new();
     private bool _disposed;
+
+    /// <summary>
+    /// Gets the native handle (for derived classes).
+    /// </summary>
+    protected IntPtr NativeHandle => _handle;
 
     /// <summary>
     /// Event raised when a WebRTC event is received.

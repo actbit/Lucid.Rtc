@@ -57,7 +57,7 @@ echo -e "\033[33mBuilding Rust library...\033[0m"
 cargo build --release -p lucid-rtc-sys --target "$TARGET"
 
 # Copy native library to NuGet structure
-NATIVE_DIR="dotnet/Lucid.Rtc.Native/$RID/native"
+NATIVE_DIR="dotnet/Lucid.Rtc.Rust/$RID/native"
 mkdir -p "$NATIVE_DIR"
 
 if [[ "$TARGET" == *"windows"* ]]; then
@@ -92,11 +92,14 @@ if [ "$PACK" = true ]; then
     # Pack Core
     dotnet pack dotnet/Lucid.Rtc.Core/Lucid.Rtc.Core.csproj -c Release -o "$ARTIFACTS_DIR"
 
-    # Pack native package for this platform
-    NATIVE_PROJ="dotnet/Lucid.Rtc.Native/Lucid.Rtc.Native.$RID.csproj"
-    if [ -f "$NATIVE_PROJ" ]; then
-        dotnet pack "$NATIVE_PROJ" -c Release -o "$ARTIFACTS_DIR"
+    # Pack Rust native packages
+    RUST_NATIVE_PROJ="dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.$RID.csproj"
+    if [ -f "$RUST_NATIVE_PROJ" ]; then
+        dotnet pack "$RUST_NATIVE_PROJ" -c Release -o "$ARTIFACTS_DIR"
     fi
+
+    # Pack Rust metapackage
+    dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o "$ARTIFACTS_DIR"
 
     echo -e "\033[32mPackages created in $ARTIFACTS_DIR/\033[0m"
 fi

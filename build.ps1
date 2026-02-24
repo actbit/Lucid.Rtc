@@ -53,7 +53,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Copy native library to NuGet structure
-$NativeDir = "dotnet/Lucid.Rtc.Native/$Rid/native"
+$NativeDir = "dotnet/Lucid.Rtc.Rust/$Rid/native"
 New-Item -ItemType Directory -Force -Path $NativeDir | Out-Null
 
 if ($Target -like "*windows*") {
@@ -96,11 +96,14 @@ if ($Pack) {
     # Pack Core
     dotnet pack dotnet/Lucid.Rtc.Core/Lucid.Rtc.Core.csproj -c Release -o $ArtifactsDir
 
-    # Pack native package for this platform
-    $NativeProj = "dotnet/Lucid.Rtc.Native/Lucid.Rtc.Native.$Rid.csproj"
-    if (Test-Path $NativeProj) {
-        dotnet pack $NativeProj -c Release -o $ArtifactsDir
+    # Pack Rust native packages
+    $RustNativeProj = "dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.$Rid.csproj"
+    if (Test-Path $RustNativeProj) {
+        dotnet pack $RustNativeProj -c Release -o $ArtifactsDir
     }
+
+    # Pack Rust metapackage
+    dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o $ArtifactsDir
 
     Write-Host "Packages created in $ArtifactsDir/" -ForegroundColor Green
 }

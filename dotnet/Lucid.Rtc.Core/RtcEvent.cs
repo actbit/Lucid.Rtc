@@ -44,9 +44,14 @@ public sealed class RtcEvent
     public string? Sdp { get; init; }
 
     /// <summary>
-    /// Data (for message events, base64 encoded).
+    /// Data (for message events, base64 encoded in JSON).
     /// </summary>
     public string? Data { get; init; }
+
+    /// <summary>
+    /// Decoded message bytes (for message_received events).
+    /// </summary>
+    public byte[]? Message { get; init; }
 
     /// <summary>
     /// ICE candidate (for ICE events).
@@ -61,7 +66,7 @@ public sealed class RtcEvent
     /// <summary>
     /// Error message (for error events).
     /// </summary>
-    public string? Message { get; init; }
+    public string? ErrorMessage { get; init; }
 }
 
 internal sealed class RtcEventConverter
@@ -115,11 +120,14 @@ internal sealed class RtcEventConverter
 
     private static RtcEvent ParseMessageEvent(JsonElement element, string type)
     {
+        var base64Data = element.GetProperty("data").GetString() ?? "";
+        var messageBytes = Convert.FromBase64String(base64Data);
         return new RtcEvent
         {
             Type = type,
             PeerId = element.GetProperty("peer_id").GetString(),
-            Data = element.GetProperty("data").GetString()
+            Data = base64Data,
+            Message = messageBytes
         };
     }
 
@@ -164,7 +172,7 @@ internal sealed class RtcEventConverter
         return new RtcEvent
         {
             Type = type,
-            Message = element.GetProperty("message").GetString()
+            ErrorMessage = element.GetProperty("message").GetString()
         };
     }
 }

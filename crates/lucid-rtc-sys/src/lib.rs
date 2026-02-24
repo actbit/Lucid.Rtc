@@ -446,3 +446,67 @@ pub extern "C" fn lucid_rtc_version() -> *const c_char {
     static VERSION: &[u8] = b"0.1.0\0";
     VERSION.as_ptr() as *const c_char
 }
+
+// ============================================
+// Media Functions (Rust backend stubs - not supported)
+// These are only available in Pion backend
+// ============================================
+
+/// Get the backend type.
+///
+/// Returns "rust" for Rust backend.
+#[no_mangle]
+pub extern "C" fn lucid_rtc_get_backend() -> *const c_char {
+    static BACKEND: &[u8] = b"rust\0";
+    BACKEND.as_ptr() as *const c_char
+}
+
+/// Get supported codecs (stub - returns empty array for Rust backend).
+#[no_mangle]
+pub extern "C" fn lucid_rtc_get_supported_codecs() -> *mut c_char {
+    // Return empty array - Rust backend doesn't support media
+    helpers::string_to_c_ptr("[]")
+}
+
+/// Create media track (stub - not supported in Rust backend).
+#[no_mangle]
+pub extern "C" fn lucid_rtc_create_media_track(
+    _handle: *mut LucidRtcClientHandle,
+    _config_json: *const c_char,
+) -> *mut c_char {
+    // Return null - not supported
+    ptr::null_mut()
+}
+
+/// Add track to peer (stub - not supported in Rust backend).
+#[no_mangle]
+pub extern "C" fn lucid_rtc_add_track_to_peer(
+    _handle: *mut LucidRtcClientHandle,
+    _peer_id: *const c_char,
+    _track_id: *const c_char,
+) -> i32 {
+    // Return error - not supported
+    -1
+}
+
+/// Send media data (stub - not supported in Rust backend).
+#[no_mangle]
+pub extern "C" fn lucid_rtc_send_media_data(
+    _handle: *mut LucidRtcClientHandle,
+    _track_id: *const c_char,
+    _data: *const u8,
+    _len: usize,
+) -> i32 {
+    // Return error - not supported
+    -1
+}
+
+/// Remove media track (stub - not supported in Rust backend).
+#[no_mangle]
+pub extern "C" fn lucid_rtc_remove_media_track(
+    _handle: *mut LucidRtcClientHandle,
+    _track_id: *const c_char,
+) -> i32 {
+    // Return error - not supported
+    -1
+}

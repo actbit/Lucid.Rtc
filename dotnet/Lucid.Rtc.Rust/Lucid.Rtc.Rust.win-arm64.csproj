@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
-    <PackageId>Lucid.Rtc.Native.linux-arm</PackageId>
+    <PackageId>Lucid.Rtc.Rust.win-arm64</PackageId>
     <Version>0.1.0</Version>
-    <Authors>Lucid.Rtc</Authors>
-    <Description>Native runtime for Lucid.Rtc (Linux ARM)</Description>
-    <PackageTags>webrtc;lucid;rtc;native;linux-arm</PackageTags>
+    <Authors>actbit</Authors>
+    <Description>Native runtime for Lucid.Rtc - Rust backend (Windows ARM64)</Description>
+    <PackageTags>webrtc;lucid;rtc;native;rust;win-arm64</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
@@ -21,10 +21,10 @@
     <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('linux-arm\native\liblucid_rtc.so')">
-    <None Include="linux-arm\native\liblucid_rtc.so">
+  <ItemGroup Condition="Exists('win-arm64\native\lucid_rtc.dll')">
+    <None Include="win-arm64\native\lucid_rtc.dll">
       <Pack>true</Pack>
-      <PackagePath>runtimes\linux-arm\native\</PackagePath>
+      <PackagePath>runtimes\win-arm64\native\</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

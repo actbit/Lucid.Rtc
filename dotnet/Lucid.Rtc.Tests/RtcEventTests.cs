@@ -138,7 +138,7 @@ public class RtcEventTests
         Assert.Single(events);
         var evt = events[0];
         Assert.Equal("error", evt.Type);
-        Assert.Equal("Connection failed", evt.Message);
+        Assert.Equal("Connection failed", evt.ErrorMessage);
     }
 
     [Fact]

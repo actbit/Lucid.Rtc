@@ -1,4 +1,25 @@
 <Solution>
   <Project Path="dotnet\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Tests\Lucid.Rtc.Tests.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc\Lucid.Rtc.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.All.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.win-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.win-x86.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.win-arm64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.linux-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.linux-arm64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.linux-arm.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.osx-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.osx-arm64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.All.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x86.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-arm64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-arm64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-arm.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.osx-x64.csproj" Type="Regular" />
+  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.osx-arm64.csproj" Type="Regular" />
 </Solution>

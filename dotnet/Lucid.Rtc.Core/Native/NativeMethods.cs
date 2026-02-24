@@ -122,4 +122,26 @@ internal static class NativeMethods
     // Version
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr lucid_rtc_version();
+
+    // ============================================
+    // Pion-specific Media Functions (may not be available in Rust backend)
+    // ============================================
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr lucid_rtc_get_backend();
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr lucid_rtc_get_supported_codecs();
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr lucid_rtc_create_media_track(IntPtr clientHandle, IntPtr configJson);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_add_track_to_peer(IntPtr clientHandle, IntPtr peerId, IntPtr trackId);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_send_media_data(IntPtr clientHandle, IntPtr trackId, byte[] data, nuint len);
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int lucid_rtc_remove_media_track(IntPtr clientHandle, IntPtr trackId);
 }
