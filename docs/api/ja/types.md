@@ -31,7 +31,7 @@ var candidate = new IceCandidate
 // High-Level API
 peer.AddIceCandidate(candidate);
 
-// Low-Level API
+// Low-level API
 client.AddIceCandidate("peer1", candidate);
 ```
 

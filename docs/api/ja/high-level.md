@@ -151,10 +151,8 @@ var peer = await connection.CreatePeerAsync("remote-peer")
     .WithVideo(VideoCodec.Vp8)
     .WithAudio(AudioCodec.Opus);
 
-// または文字列で指定
-var peer = await connection.CreatePeerAsync("remote-peer")
-    .WithVideo("vp8")
-    .WithAudio("opus");
+// または文字列で指定:
+// .WithVideo("vp8").WithAudio("opus")
 
 peer.SetRemoteOffer(remoteOfferSdp);
 peer.AddIceCandidate(candidate);

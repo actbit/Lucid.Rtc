@@ -151,10 +151,8 @@ var peer = await connection.CreatePeerAsync("remote-peer")
     .WithVideo(VideoCodec.Vp8)
     .WithAudio(AudioCodec.Opus);
 
-// Or using strings
-var peer = await connection.CreatePeerAsync("remote-peer")
-    .WithVideo("vp8")
-    .WithAudio("opus");
+// Or using strings:
+// .WithVideo("vp8").WithAudio("opus")
 
 peer.SetRemoteOffer(remoteOfferSdp);
 peer.AddIceCandidate(candidate);

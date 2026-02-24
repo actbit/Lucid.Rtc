@@ -9,7 +9,7 @@ Console.WriteLine("=== Lucid.Rtc High-Level API Sample ===");
 Console.WriteLine($"Version: {RtcConnection.Version}");
 
 // ===== 接続作成（チェーン可） =====
-using var connection = new RtcConnectionBuilder()
+await using var connection = new RtcConnectionBuilder()
     .WithStunServer("stun:stun.l.google.com:19302")
     .WithStunServer("stun:stun1.l.google.com:19302")
     // .WithTurnServer("turn:example.com:3478", "username", "password")
@@ -109,4 +109,4 @@ Console.WriteLine("Press any key to exit...");
 Console.ReadKey();
 
 await peer.CloseAsync();
-await connection.DisposeAsync();
+// connection は await using で自動的に破棄される
