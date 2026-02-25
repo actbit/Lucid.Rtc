@@ -245,8 +245,6 @@ Lucid.Rtc.Rust               # Rust backend packages
 
 Lucid.Rtc.Pion               # Pion backend packages
 ├── Lucid.Rtc.Pion.win-x64
-├── Lucid.Rtc.Pion.win-x86
-├── Lucid.Rtc.Pion.win-arm64
 ├── Lucid.Rtc.Pion.linux-x64
 ├── Lucid.Rtc.Pion.linux-arm64
 ├── Lucid.Rtc.Pion.linux-arm

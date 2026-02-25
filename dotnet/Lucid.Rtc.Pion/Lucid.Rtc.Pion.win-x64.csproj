@@ -13,6 +13,11 @@
     <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
+  <!-- Include buildTransitive for NuGet framework detection -->
+  <ItemGroup>
+    <None Include="build\**" Pack="true" PackagePath="buildTransitive\" />
+  </ItemGroup>
+
   <ItemGroup Condition="Exists('win-x64\native\lucid_rtc.dll')">
     <None Include="win-x64\native\lucid_rtc.dll">
       <Pack>true</Pack>

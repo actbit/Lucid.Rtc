@@ -15,8 +15,6 @@
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.osx-arm64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.All.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x64.csproj" Type="Regular" />
-  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x86.csproj" Type="Regular" />
-  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-arm64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-x64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-arm64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-arm.csproj" Type="Regular" />

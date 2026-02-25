@@ -15,6 +15,9 @@ on:
         default: 'false'
         type: boolean
 
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
@@ -115,7 +118,6 @@ jobs:
 
   # Build Pion (Go) native libraries
   build-pion:
-    if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
     strategy:
       fail-fast: false
       matrix:
@@ -232,7 +234,8 @@ jobs:
 
   # Build .NET packages
   build-dotnet:
-    needs: [build-rust]
+    needs: [build-rust, build-pion]
+    if: always() && needs.build-rust.result == 'success' && (needs.build-pion.result == 'success' || needs.build-pion.result == 'skipped')
     runs-on: ubuntu-latest
 
     steps:
@@ -252,7 +255,6 @@ jobs:
           merge-multiple: true
 
       - name: Download Pion artifacts
-        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/download-artifact@v4
         with:
           pattern: pion-*
@@ -296,7 +298,6 @@ jobs:
         run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts --no-build
 
       - name: Pack Pion platform-specific packages
-        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         run: |
           for proj in dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.*.csproj; do
             if [[ "$proj" != *"Pion.All"* ]] && [[ "$proj" != *"Pion.csproj"* ]]; then
@@ -306,11 +307,9 @@ jobs:
         continue-on-error: true
 
       - name: Pack Lucid.Rtc.Pion.All
-        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.All.csproj -c Release -o artifacts || true
 
       - name: Pack Lucid.Rtc.Pion metapackage
-        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts --no-build || true
 
       - name: List packages
