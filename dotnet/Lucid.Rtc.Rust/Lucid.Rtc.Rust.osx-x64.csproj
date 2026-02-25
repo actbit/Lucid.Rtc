@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Rust.osx-x64</PackageId>
@@ -11,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('osx-x64\native\liblucid_rtc.dylib')">
-    <None Include="osx-x64\native\liblucid_rtc.dylib">
+  <ItemGroup Condition="Exists('osx-x64/native/liblucid_rtc.dylib')">
+    <None Include="osx-x64/native/liblucid_rtc.dylib">
       <Pack>true</Pack>
-      <PackagePath>runtimes\osx-x64\native\</PackagePath>
+      <PackagePath>runtimes/osx-x64/native/</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

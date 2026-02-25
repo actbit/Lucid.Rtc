@@ -184,7 +184,9 @@ jobs:
 
       - name: Install mingw (Windows x86)
         if: matrix.goos == 'windows' && matrix.goarch == '386'
-        run: choco install mingw -y --x86
+        run: |
+          choco install mingw -y --x86 --force
+          echo "C:\Program Files (x86)\mingw32\bin" >> $GITHUB_PATH
 
       - name: Install cross-compiler (Linux arm64)
         if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
@@ -203,6 +205,7 @@ jobs:
           echo "CXX=arm-linux-gnueabihf-g++" >> $GITHUB_ENV
 
       - name: Build Pion library
+        id: build-pion
         shell: bash
         env:
           GOOS: ${{ matrix.goos }}
@@ -221,6 +224,7 @@ jobs:
           fi
 
       - name: Prepare artifact
+        if: success() || steps.build-pion.outcome == 'success'
         shell: bash
         run: |
           mkdir -p artifact/${{ matrix.rid }}/native

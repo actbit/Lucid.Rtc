@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc</PackageId>

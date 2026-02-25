@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Pion.osx-arm64</PackageId>
@@ -11,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('osx-arm64\native\liblucid_rtc.dylib')">

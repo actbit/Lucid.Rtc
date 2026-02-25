@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Rust</PackageId>
@@ -12,7 +11,7 @@
 
   <!-- Depends on Core -->
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
   <!-- Platform-specific native packages -->

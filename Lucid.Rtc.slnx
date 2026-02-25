@@ -3,7 +3,7 @@
   <Project Path="dotnet\Lucid.Rtc.Tests\Lucid.Rtc.Tests.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc\Lucid.Rtc.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.MessagePack\Lucid.Rtc.MessagePack.csproj" Type="Regular" />
-  <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.csproj" Type="Regular" />
+  <!-- Platform-specific packages (can be built locally) -->
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.All.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.win-x64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.win-x86.csproj" Type="Regular" />
@@ -13,7 +13,6 @@
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.linux-arm.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.osx-x64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Rust\Lucid.Rtc.Rust.osx-arm64.csproj" Type="Regular" />
-  <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.All.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.win-x86.csproj" Type="Regular" />
@@ -23,6 +22,7 @@
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.linux-arm.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.osx-x64.csproj" Type="Regular" />
   <Project Path="dotnet\Lucid.Rtc.Pion\Lucid.Rtc.Pion.osx-arm64.csproj" Type="Regular" />
+  <!-- Samples -->
   <Project Path="dotnet\samples\HighLevelSample\HighLevelSample.csproj" Type="Regular" />
   <Project Path="dotnet\samples\LowLevelSample\LowLevelSample.csproj" Type="Regular" />
 </Solution>

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Rust.win-arm64</PackageId>
@@ -11,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('win-arm64\native\lucid_rtc.dll')">
-    <None Include="win-arm64\native\lucid_rtc.dll">
+  <ItemGroup Condition="Exists('win-arm64/native/lucid_rtc.dll')">
+    <None Include="win-arm64/native/lucid_rtc.dll">
       <Pack>true</Pack>
-      <PackagePath>runtimes\win-arm64\native\</PackagePath>
+      <PackagePath>runtimes/win-arm64/native/</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

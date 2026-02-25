@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Rust.linux-arm</PackageId>
@@ -11,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('linux-arm\native\liblucid_rtc.so')">
-    <None Include="linux-arm\native\liblucid_rtc.so">
+  <ItemGroup Condition="Exists('linux-arm/native/liblucid_rtc.so')">
+    <None Include="linux-arm/native/liblucid_rtc.so">
       <Pack>true</Pack>
-      <PackagePath>runtimes\linux-arm\native\</PackagePath>
+      <PackagePath>runtimes/linux-arm/native/</PackagePath>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
