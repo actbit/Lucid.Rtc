@@ -1,20 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
+    <!-- Package metadata -->
     <PackageId>Lucid.Rtc.Rust.osx-x64</PackageId>
-    <Version>0.1.0</Version>
-    <Authors>actbit</Authors>
     <Description>Native runtime for Lucid.Rtc - Rust backend (macOS x64)</Description>
     <PackageTags>webrtc;lucid;rtc;native;rust;osx-x64</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

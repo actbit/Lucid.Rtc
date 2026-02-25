@@ -1,21 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
     <!-- Package metadata -->
     <PackageId>Lucid.Rtc</PackageId>
-    <Version>0.1.0</Version>
-    <Authors>actbit</Authors>
     <Description>Lucid.Rtc - WebRTC DataChannel for .NET (lightweight, Rust backend, P2P). This metapackage includes everything you need to get started.</Description>
     <PackageTags>webrtc;p2p;realtime;datachannel;dotnet;rust</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

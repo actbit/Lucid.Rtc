@@ -1,33 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <RootNamespace>Lucid.Rtc</RootNamespace>
 
-    <!-- NuGet Package Metadata -->
+    <!-- Package metadata -->
     <PackageId>Lucid.Rtc.MessagePack</PackageId>
-    <Version>0.1.0</Version>
-    <Authors>Lucid.Rtc</Authors>
     <Description>MessagePack serialization support for Lucid.Rtc</Description>
     <PackageTags>webrtc;messagepack;serialization;lucid;rtc</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/actbit/Lucid.Rtc</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-
-    <!-- NuGet Package Settings -->
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MessagePack" Version="3.0.308" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

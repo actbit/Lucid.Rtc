@@ -284,7 +284,10 @@ jobs:
       - name: Pack Lucid.Rtc.Core
         run: dotnet pack dotnet/Lucid.Rtc.Core/Lucid.Rtc.Core.csproj -c Release -o artifacts
 
-      - name: Pack Rust native packages
+      - name: Pack Lucid.Rtc.MessagePack
+        run: dotnet pack dotnet/Lucid.Rtc.MessagePack/Lucid.Rtc.MessagePack.csproj -c Release -o artifacts
+
+      - name: Pack Rust platform-specific packages
         run: |
           for proj in dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.*.csproj; do
             if [[ "$proj" != *"Rust.All"* ]] && [[ "$proj" != *"Rust.csproj"* ]]; then
@@ -295,10 +298,13 @@ jobs:
       - name: Pack Lucid.Rtc.Rust.All
         run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.All.csproj -c Release -o artifacts
 
+      - name: Pack Lucid.Rtc.Rust metapackage
+        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o artifacts
+
       - name: Pack Lucid.Rtc metapackage
         run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts
 
-      - name: Pack Pion native packages
+      - name: Pack Pion platform-specific packages
         if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         run: |
           for proj in dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.*.csproj; do
@@ -306,9 +312,15 @@ jobs:
               dotnet pack "$proj" -c Release -o artifacts --no-build || true
             fi
           done
-          dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.All.csproj -c Release -o artifacts || true
-          dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts || true
         continue-on-error: true
+
+      - name: Pack Lucid.Rtc.Pion.All
+        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
+        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.All.csproj -c Release -o artifacts || true
+
+      - name: Pack Lucid.Rtc.Pion metapackage
+        if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
+        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts || true
 
       - name: List packages
         run: ls -la artifacts/
