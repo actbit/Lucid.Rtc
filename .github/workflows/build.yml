@@ -125,16 +125,6 @@ jobs:
             os: windows-latest
             rid: win-x64
             ext: dll
-          - goos: windows
-            goarch: 386
-            os: windows-latest
-            rid: win-x86
-            ext: dll
-          - goos: windows
-            goarch: arm64
-            os: windows-latest
-            rid: win-arm64
-            ext: dll
           - goos: linux
             goarch: amd64
             os: ubuntu-latest
@@ -181,12 +171,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ matrix.goos }}-${{ matrix.goarch }}-${{ hashFiles('pion/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-${{ matrix.goos }}-${{ matrix.goarch }}-
-
-      - name: Install mingw (Windows x86)
-        if: matrix.goos == 'windows' && matrix.goarch == '386'
-        run: |
-          choco install mingw -y --x86 --force
-          echo "C:\Program Files (x86)\mingw32\bin" >> $GITHUB_PATH
 
       - name: Install cross-compiler (Linux arm64)
         if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
@@ -302,11 +286,14 @@ jobs:
       - name: Pack Lucid.Rtc.Rust.All
         run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.All.csproj -c Release -o artifacts
 
+      - name: Add local NuGet source
+        run: dotnet nuget add source $(pwd)/artifacts -n local
+
       - name: Pack Lucid.Rtc.Rust metapackage
-        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o artifacts
+        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o artifacts --no-build
 
       - name: Pack Lucid.Rtc metapackage
-        run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts
+        run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts --no-build
 
       - name: Pack Pion platform-specific packages
         if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
@@ -324,7 +311,7 @@ jobs:
 
       - name: Pack Lucid.Rtc.Pion metapackage
         if: ${{ github.event.inputs.build_pion == 'true' || startsWith(github.ref, 'refs/tags/v') }}
-        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts || true
+        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts --no-build || true
 
       - name: List packages
         run: ls -la artifacts/
