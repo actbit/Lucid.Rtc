@@ -10,6 +10,11 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <!-- Include README -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
   <!-- Project references (for local build) -->
   <ItemGroup>
     <ProjectReference Include="..\Lucid.Rtc.Core\Lucid.Rtc.Core.csproj" />
