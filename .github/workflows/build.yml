@@ -247,6 +247,19 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Set version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "Package version: $VERSION"
+          else
+            VERSION="0.0.0-dev"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "Development build version: $VERSION"
+          fi
+
       - name: Download Rust artifacts
         uses: actions/download-artifact@v4
         with:
@@ -266,51 +279,51 @@ jobs:
         run: find dotnet -name "*.dll" -o -name "*.so" -o -name "*.dylib" | head -20
 
       - name: Build .NET solution
-        run: dotnet build Lucid.Rtc.slnx -c Release
+        run: dotnet build Lucid.Rtc.slnx -c Release -p:Version=${{ steps.version.outputs.version }}
 
       - name: Run tests
         run: dotnet test Lucid.Rtc.slnx -c Release --no-build
 
       - name: Pack Lucid.Rtc.Core
-        run: dotnet pack dotnet/Lucid.Rtc.Core/Lucid.Rtc.Core.csproj -c Release -o artifacts
+        run: dotnet pack dotnet/Lucid.Rtc.Core/Lucid.Rtc.Core.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack Lucid.Rtc.MessagePack
-        run: dotnet pack dotnet/Lucid.Rtc.MessagePack/Lucid.Rtc.MessagePack.csproj -c Release -o artifacts
+        run: dotnet pack dotnet/Lucid.Rtc.MessagePack/Lucid.Rtc.MessagePack.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack Rust platform-specific packages
         run: |
           for proj in dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.*.csproj; do
             if [[ "$proj" != *"Rust.All"* ]] && [[ "$proj" != *"Rust.csproj"* ]]; then
-              dotnet pack "$proj" -c Release -o artifacts --no-build || true
+              dotnet pack "$proj" -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }} || true
             fi
           done
 
       - name: Pack Lucid.Rtc.Rust.All
-        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.All.csproj -c Release -o artifacts
+        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.All.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }}
 
       - name: Add local NuGet source
         run: dotnet nuget add source $(pwd)/artifacts -n local
 
       - name: Pack Lucid.Rtc.Rust metapackage
-        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o artifacts --no-build
+        run: dotnet pack dotnet/Lucid.Rtc.Rust/Lucid.Rtc.Rust.csproj -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack Lucid.Rtc metapackage
-        run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts --no-build
+        run: dotnet pack dotnet/Lucid.Rtc/Lucid.Rtc.csproj -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }}
 
       - name: Pack Pion platform-specific packages
         run: |
           for proj in dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.*.csproj; do
             if [[ "$proj" != *"Pion.All"* ]] && [[ "$proj" != *"Pion.csproj"* ]]; then
-              dotnet pack "$proj" -c Release -o artifacts --no-build || true
+              dotnet pack "$proj" -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }} || true
             fi
           done
         continue-on-error: true
 
       - name: Pack Lucid.Rtc.Pion.All
-        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.All.csproj -c Release -o artifacts || true
+        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.All.csproj -c Release -o artifacts -p:Version=${{ steps.version.outputs.version }} || true
 
       - name: Pack Lucid.Rtc.Pion metapackage
-        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts --no-build || true
+        run: dotnet pack dotnet/Lucid.Rtc.Pion/Lucid.Rtc.Pion.csproj -c Release -o artifacts --no-build -p:Version=${{ steps.version.outputs.version }} || true
 
       - name: List packages
         run: ls -la artifacts/
