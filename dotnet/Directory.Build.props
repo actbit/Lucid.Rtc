@@ -23,11 +23,6 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <!-- Include README in all packages -->
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)..\README.md')" />
-  </ItemGroup>
-
   <!-- SourceLink settings (only for packages with build output) -->
   <PropertyGroup Condition="'$(IncludeBuildOutput)' != 'false'">
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

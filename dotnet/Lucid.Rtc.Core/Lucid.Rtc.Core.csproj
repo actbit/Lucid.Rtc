@@ -8,7 +8,13 @@
     <PackageId>Lucid.Rtc.Core</PackageId>
     <Description>WebRTC bindings for .NET (managed library only - requires native runtime package)</Description>
     <PackageTags>webrtc;p2p;realtime;datachannel;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <!-- Include README from repository root -->
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <!-- Allow tests to access internal members -->
   <ItemGroup>
