@@ -23,14 +23,14 @@
 
 ```xml
 <!-- コアライブラリ + Rustバックエンド (DataChannel向け推奨) -->
-<PackageReference Include="Lucid.Rtc" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc" Version="0.1.4" />
 
 <!-- または メディアサポート付き (Pionバックエンド) -->
-<PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
-<PackageReference Include="Lucid.Rtc.Pion.win-x64" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.Core" Version="0.1.4" />
+<PackageReference Include="Lucid.Rtc.Pion.win-x64" Version="0.1.4" />
 
 <!-- オプション: MessagePackシリアライズ -->
-<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.4" />
 ```
 
 ### 基本的な使い方
@@ -179,7 +179,7 @@ await peer.CloseAsync();
 型安全なオブジェクトシリアライズ用オプションパッケージ:
 
 ```xml
-<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.4" />
 ```
 
 ```csharp

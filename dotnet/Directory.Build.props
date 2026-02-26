@@ -23,6 +23,11 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
+  <!-- PackageType for native packages (no build output) -->
+  <ItemGroup Condition="'$(IncludeBuildOutput)' == 'false'">
+    <PackageType Include="Dependency" />
+  </ItemGroup>
+
   <!-- SourceLink settings (only for packages with build output) -->
   <PropertyGroup Condition="'$(IncludeBuildOutput)' != 'false'">
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

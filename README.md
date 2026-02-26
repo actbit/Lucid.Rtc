@@ -23,14 +23,14 @@
 
 ```xml
 <!-- Core library + Rust backend (recommended for DataChannel) -->
-<PackageReference Include="Lucid.Rtc" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc" Version="0.1.4" />
 
 <!-- Or with media support (Pion backend) -->
-<PackageReference Include="Lucid.Rtc.Core" Version="0.1.0" />
-<PackageReference Include="Lucid.Rtc.Pion.win-x64" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.Core" Version="0.1.4" />
+<PackageReference Include="Lucid.Rtc.Pion.win-x64" Version="0.1.4" />
 
 <!-- Optional: MessagePack serialization -->
-<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.4" />
 ```
 
 ### Basic Usage
@@ -179,7 +179,7 @@ await peer.CloseAsync();
 Optional package for strongly-typed object serialization:
 
 ```xml
-<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.0" />
+<PackageReference Include="Lucid.Rtc.MessagePack" Version="0.1.4" />
 ```
 
 ```csharp
